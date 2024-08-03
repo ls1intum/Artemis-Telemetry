@@ -30,12 +30,6 @@ public class TelemetryResource {
         return ResponseEntity.ok(TelemetryDTO.from(savedTelemetry));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTelemetry(@PathVariable Long id) {
-        telemetryService.delete(id);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping
     public ResponseEntity<List<TelemetryDTO>> getAllTelemetry() {
         return ResponseEntity.ok(telemetryService.getAll().stream()
