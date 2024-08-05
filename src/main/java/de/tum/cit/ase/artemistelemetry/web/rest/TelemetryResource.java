@@ -25,8 +25,7 @@ public class TelemetryResource {
 
     @PostMapping
     public ResponseEntity<TelemetryDTO> postTelemetry(@RequestBody TelemetryDTO telemetryDTO) {
-        Telemetry savedTelemetry;
-        savedTelemetry = telemetryService.updateTelemetryByUniversityName(TelemetryDTO.to(telemetryDTO));
+        Telemetry savedTelemetry = telemetryService.saveNewTelemetry(TelemetryDTO.to(telemetryDTO));
         return ResponseEntity.ok(TelemetryDTO.from(savedTelemetry));
     }
 

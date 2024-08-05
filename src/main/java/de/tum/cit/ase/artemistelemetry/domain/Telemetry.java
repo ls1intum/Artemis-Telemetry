@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+import java.time.ZonedDateTime;
+
 @Entity
 @Table(name = "telemetry")
 public class Telemetry extends DomainObject {
@@ -14,7 +16,7 @@ public class Telemetry extends DomainObject {
     @Column(name = "version")
     private String version;
 
-    @Column(name = "university_name", unique = true)
+    @Column(name = "university_name")
     private String universityName;
 
     @Column(name = "admin_name")
@@ -22,6 +24,9 @@ public class Telemetry extends DomainObject {
     
     @Column(name = "profiles")
     private String profiles;
+
+    @Column(name = "timestamp")
+    private ZonedDateTime timestamp;
 
     public String getProfiles() {
         return profiles;
@@ -61,5 +66,13 @@ public class Telemetry extends DomainObject {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    public ZonedDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(ZonedDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }

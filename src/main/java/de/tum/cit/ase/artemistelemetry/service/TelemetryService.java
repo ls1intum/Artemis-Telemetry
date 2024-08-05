@@ -4,6 +4,7 @@ import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
 import de.tum.cit.ase.artemistelemetry.repository.TelemetryRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -14,6 +15,12 @@ public class TelemetryService {
 
     public TelemetryService(TelemetryRepository telemetryRepository) {
         this.telemetryRepository = telemetryRepository;
+    }
+
+    public Telemetry saveNewTelemetry(Telemetry telemetry) {
+        telemetry.setId(null);
+        telemetry.setTimestamp(ZonedDateTime.now());
+        return telemetryRepository.save(telemetry);
     }
 
     public Telemetry save(Telemetry telemetry) {
