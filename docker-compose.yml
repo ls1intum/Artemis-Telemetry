@@ -1,5 +1,6 @@
 services:
   telemetry:
+    container_name: artemis-telemetry
     image: ls1tum/artemis-telemetry:latest
     build:
       context: .
@@ -20,6 +21,7 @@ services:
     restart: always
 
   mysql:
+    container_name: mysql
     image: mysql:8.4.0
     volumes:
       - artemis-telemetry-mysql-data:/var/lib/mysql
