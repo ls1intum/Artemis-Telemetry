@@ -47,10 +47,10 @@ jobs:
           host: ${{ vars.URL }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          proxy_host: ${{ secrets.GATEWAY_HOST }}
-          proxy_username: ${{ secrets.GATEWAY_USER }}
-          proxy_key: ${{ secrets.GATEWAY_SSH_KEY }}
-          proxy_port: ${{ secrets.GATEWAY_PORT }}
+          proxy_host: ${{ vars.DEPLOYMENT_GATEWAY_HOST }}
+          proxy_username: ${{ vars.DEPLOYMENT_GATEWAY_USER }}
+          proxy_key: ${{ secrets.DEPLOYMENT_GATEWAY_SSH_KEY }}
+          proxy_port: ${{ vars.DEPLOYMENT_GATEWAY_PORT }}
           script: |
             docker-compose -f /opt/artemis-telemetry/docker-compose.yml -f /opt/artemis-telemetry/docker-compose.prod.yml pull
             docker-compose -f /opt/artemis-telemetry/docker-compose.yml -f /opt/artemis-telemetry/docker-compose.prod.yml up -d --remove-orphans --force-recreate
