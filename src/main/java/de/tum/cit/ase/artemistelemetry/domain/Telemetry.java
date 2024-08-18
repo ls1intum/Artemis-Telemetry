@@ -28,6 +28,9 @@ public class Telemetry extends DomainObject {
     @Column(name = "timestamp")
     private ZonedDateTime timestamp;
 
+    @Column(name = "contact")
+    private String contact;
+
     public String getProfiles() {
         return profiles;
     }
@@ -74,5 +77,13 @@ public class Telemetry extends DomainObject {
 
     public void setTimestamp(ZonedDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 }
