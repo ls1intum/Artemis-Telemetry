@@ -3,7 +3,7 @@ Use `docker compose up` for quick start.
 ## Development
 
 ### Running [Artemis](https://github.com/ls1intum/Artemis) in parallel (locally)
-Adjust the port on which the telemetry service and its database are running (with the default configuration Artemis will be running on port 8080 and a mysql database on port 3306).
+Adjust the port on which the telemetry service and its database are running (with the default configuration Artemis will be running on port `8080` and a mysql database on port `3306`).
 
 Adjust the `docker-compose.yml` accordingly, e.g. the following adjustments will be needed to run the telemetry service on port `8081` and its database on port `3307`:  
 ```
