@@ -40,8 +40,8 @@ public class TelemetryService {
                 .toList();
     }
 
-    public Telemetry updateTelemetryByUniversityName(Telemetry newTelemetry) {
-        Telemetry telemetry = telemetryRepository.findByUniversityName(newTelemetry.getUniversityName());
+    public Telemetry updateTelemetryByOperatorName(Telemetry newTelemetry) {
+        Telemetry telemetry = telemetryRepository.findByOperatorName(newTelemetry.getOperatorName());
         if (telemetry == null) {
             return telemetryRepository.save(newTelemetry);
         }

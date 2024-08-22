@@ -11,7 +11,7 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
 
     public static TelemetryDTO from(Telemetry telemetry) {
         List<String> profilesList = List.of(telemetry.getProfiles().split(","));
-        return new TelemetryDTO(telemetry.getId(), telemetry.getVersion(), telemetry.getServerUrl(), telemetry.getUniversityName(), telemetry.getMainAdminName(), profilesList, telemetry.getContact(), telemetry.getTimestamp());
+        return new TelemetryDTO(telemetry.getId(), telemetry.getVersion(), telemetry.getServerUrl(), telemetry.getOperatorName(), telemetry.getAdminName(), profilesList, telemetry.getContact(), telemetry.getTimestamp());
     }
 
     public static Telemetry to(TelemetryDTO telemetryDTO) {
@@ -20,8 +20,8 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
         telemetry.setId(telemetryDTO.id());
         telemetry.setVersion(telemetryDTO.version());
         telemetry.setServerUrl(telemetryDTO.serverUrl());
-        telemetry.setUniversityName(telemetryDTO.operator());
-        telemetry.setMainAdminName(telemetryDTO.adminName());
+        telemetry.setOperatorName(telemetryDTO.operator());
+        telemetry.setAdminName(telemetryDTO.adminName());
         telemetry.setProfiles(profiles);
         telemetry.setTimestamp(telemetryDTO.timestamp());
         telemetry.setContact(telemetryDTO.contact());

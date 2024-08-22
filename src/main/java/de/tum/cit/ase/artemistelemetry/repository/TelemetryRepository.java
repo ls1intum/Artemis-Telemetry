@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TelemetryRepository extends CrudRepository<Telemetry, Long> {
-    Telemetry findByUniversityName(String universityName);
+    Telemetry findByOperatorName(String operatorName);
 }
