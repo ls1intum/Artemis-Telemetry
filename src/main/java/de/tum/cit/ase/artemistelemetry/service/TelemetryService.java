@@ -2,6 +2,7 @@ package de.tum.cit.ase.artemistelemetry.service;
 
 import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
 import de.tum.cit.ase.artemistelemetry.repository.TelemetryRepository;
+import de.tum.cit.ase.artemistelemetry.service.dto.TelemetryDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -47,5 +48,20 @@ public class TelemetryService {
         }
         newTelemetry.setId(telemetry.getId());
         return telemetryRepository.save(newTelemetry);
+    }
+
+    public void validateTelemetry(TelemetryDTO telemetry) throws IllegalArgumentException {
+        if (telemetry.operator() == null || telemetry.operator().isEmpty()) {
+            throw new IllegalArgumentException("University name must not be empty");
+        }
+        if (telemetry.profiles() == null || telemetry.profiles().isEmpty()) {
+            throw new IllegalArgumentException("Profiles must not be empty");
+        }
+        if (telemetry.serverUrl() == null || telemetry.serverUrl().isEmpty()) {
+            throw new IllegalArgumentException("Server URL must not be empty");
+        }
+        if (telemetry.version() == null || telemetry.version().isEmpty()) {
+            throw new IllegalArgumentException("Version must not be empty");
+        }
     }
 }
