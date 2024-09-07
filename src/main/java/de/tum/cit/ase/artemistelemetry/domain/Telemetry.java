@@ -16,11 +16,11 @@ public class Telemetry extends DomainObject {
     @Column(name = "version")
     private String version;
 
-    @Column(name = "university_name")
-    private String universityName;
+    @Column(name = "operator_name")
+    private String operatorName;
 
     @Column(name = "admin_name")
-    private String mainAdminName;
+    private String adminName;
     
     @Column(name = "profiles")
     private String profiles;
@@ -39,20 +39,20 @@ public class Telemetry extends DomainObject {
         this.profiles = profiles;
     }
 
-    public String getMainAdminName() {
-        return mainAdminName;
+    public String getAdminName() {
+        return adminName;
     }
 
-    public void setMainAdminName(String mainAdminName) {
-        this.mainAdminName = mainAdminName;
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
     }
 
-    public String getUniversityName() {
-        return universityName;
+    public String getOperatorName() {
+        return operatorName;
     }
 
-    public void setUniversityName(String universityName) {
-        this.universityName = universityName;
+    public void setOperatorName(String operatorName) {
+        this.operatorName = operatorName;
     }
 
     public String getVersion() {
