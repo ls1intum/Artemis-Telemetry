@@ -24,6 +24,7 @@ dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "com.zaxxer:HikariCP"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.liquibase:liquibase-core'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     runtimeOnly 'com.mysql:mysql-connector-j'
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"

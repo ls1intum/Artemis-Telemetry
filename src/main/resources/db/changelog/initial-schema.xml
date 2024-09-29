@@ -1,0 +1,23 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Example: Create Table -->
+    <changeSet id="2024092812000000" author="bbesrour">
+        <createTable tableName="telemetry">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="admin_name" type="VARCHAR(255)"/>
+            <column name="contact" type="VARCHAR(255)"/>
+            <column name="operator_name" type="VARCHAR(255)"/>
+            <column name="profiles" type="VARCHAR(255)"/>
+            <column name="server_url" type="VARCHAR(255)"/>
+            <column name="timestamp" type="datetime(6)"/>
+            <column name="version" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
