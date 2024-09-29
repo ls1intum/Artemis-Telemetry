@@ -31,6 +31,18 @@ public class Telemetry extends DomainObject {
     @Column(name = "contact")
     private String contact;
 
+    @Column(name = "is_production_instance")
+    private boolean isProductionInstance;
+
+    @Column(name = "datasource")
+    private String dataSource;
+
+    @Column(name = "number_of_nodes")
+    private int numberOfNodes;
+
+    @Column(name = "build_agent_count")
+    private int buildAgentCount;
+
     public String getProfiles() {
         return profiles;
     }
@@ -85,5 +97,37 @@ public class Telemetry extends DomainObject {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public boolean isProductionInstance() {
+        return isProductionInstance;
+    }
+
+    public void setProductionInstance(boolean productionInstance) {
+        isProductionInstance = productionInstance;
+    }
+
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    public void setNumberOfNodes(int numberOfNodes) {
+        this.numberOfNodes = numberOfNodes;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public int getBuildAgentCount() {
+        return buildAgentCount;
+    }
+
+    public void setBuildAgentCount(int buildAgentCount) {
+        this.buildAgentCount = buildAgentCount;
     }
 }

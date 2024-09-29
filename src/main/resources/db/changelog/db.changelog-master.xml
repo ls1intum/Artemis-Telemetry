@@ -7,5 +7,5 @@
 
     <!-- Reference changesets here -->
     <include file="classpath:db/changelog/initial-schema.xml"/>
-<!--    <include file="classpath:db/changelog/20240929130000.xml"/>-->
+    <include file="classpath:db/changelog/20240929130000.xml"/>
 </databaseChangeLog>

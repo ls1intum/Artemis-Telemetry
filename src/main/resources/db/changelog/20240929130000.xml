@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="20240929130000_1" author="bbesrour">
+        <addColumn tableName="telemetry">
+            <column name="is_production_instance" type="boolean" defaultValue="false"/>
+            <column name="datasource" type="longtext"/>
+            <column name="number_of_nodes" type="int" defaultValue="0"/>
+            <column name="build_agent_count" type="int" defaultValue="0"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
