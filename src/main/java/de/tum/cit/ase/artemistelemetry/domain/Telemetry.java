@@ -34,6 +34,9 @@ public class Telemetry extends DomainObject {
     @Column(name = "is_production_instance")
     private boolean isProductionInstance;
 
+    @Column(name = "is_test_server")
+    private boolean isTestServer;
+
     @Column(name = "datasource")
     private String dataSource;
 
@@ -129,5 +132,13 @@ public class Telemetry extends DomainObject {
 
     public void setBuildAgentCount(int buildAgentCount) {
         this.buildAgentCount = buildAgentCount;
+    }
+
+    public boolean isTestServer() {
+        return isTestServer;
+    }
+
+    public void setTestServer(boolean testServer) {
+        isTestServer = testServer;
     }
 }
