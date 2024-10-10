@@ -9,4 +9,5 @@
     <include file="classpath:db/changelog/initial-schema.xml"/>
     <include file="classpath:db/changelog/20240929130000.xml"/>
     <include file="classpath:db/changelog/20241001210000.xml"/>
+    <include file="classpath:db/changelog/20241010210000.xml"/>
 </databaseChangeLog>

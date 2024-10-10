@@ -37,6 +37,9 @@ public class Telemetry extends DomainObject {
     @Column(name = "is_test_server")
     private boolean isTestServer;
 
+    @Column(name = "is_multi_node")
+    private boolean isMultiNode;
+
     @Column(name = "datasource")
     private String dataSource;
 
@@ -140,5 +143,13 @@ public class Telemetry extends DomainObject {
 
     public void setTestServer(boolean testServer) {
         isTestServer = testServer;
+    }
+
+    public boolean isMultiNode() {
+        return isMultiNode;
+    }
+
+    public void setMultiNode(boolean multiNode) {
+        isMultiNode = multiNode;
     }
 }
