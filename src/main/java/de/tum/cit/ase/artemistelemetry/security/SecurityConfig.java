@@ -16,10 +16,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${telemetry.user}") // Reads from environment or application.properties
+    @Value("${telemetry.user}")
     private String telemetryUser;
 
-    @Value("${telemetry.password}") // Reads from environment or application.properties
+    @Value("${telemetry.password}")
     private String telemetryPassword;
 
 
@@ -27,12 +27,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // disable CSRF for simplicity; enable if needed
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/telemetry/**").authenticated() // secure telemetry endpoints
-                        .anyRequest().permitAll() // allow other requests to be public
+                        .requestMatchers(HttpMethod.GET, "/api/telemetry/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .httpBasic(httpBasic -> {}); // enable basic auth with lambda configuration
+                .httpBasic(httpBasic -> {});
 
         return http.build();
     }
