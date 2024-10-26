@@ -24,3 +24,10 @@ artemis:
     sendAdminDetails: true
     destination: http://localhost:8081
 ```
+
+We use basic authentication for getting the data from the telemetry service. You will need to adjust the `application.yml` of the telemetry service accordingly:
+```
+telemetry:
+    user: <user>
+    password: <password>
+```

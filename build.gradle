@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.hibernate.orm:hibernate-community-dialects:${hibernate_version}"
     implementation "org.apache.commons:commons-lang3"
     implementation "com.zaxxer:HikariCP"
