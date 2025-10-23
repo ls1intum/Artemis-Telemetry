@@ -22,7 +22,7 @@ services:
 
   mysql:
     container_name: mysql
-    image: mysql:9.0.1
+    image: mysql:9.5.0
     volumes:
       - artemis-telemetry-mysql-data:/var/lib/mysql
     env_file:
