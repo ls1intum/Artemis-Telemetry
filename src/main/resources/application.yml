@@ -6,9 +6,13 @@ spring:
     url: jdbc:mysql://localhost:3306/artemis-telemetry?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
     username: root
     #        password: 12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       poolName: Hikari
       auto-commit: false
+      minimum-idle: 5
+      maximum-pool-size: 20
+      transaction-isolation: TRANSACTION_READ_COMMITTED
       data-source-properties:
         cachePrepStmts: true
         prepStmtCacheSize: 250
@@ -18,11 +22,30 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
   jpa:
+    database: mysql
+    open-in-view: false
+    show-sql: false
     hibernate:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    properties:
+      hibernate.format_sql: false
+      hibernate.use_sql_comments: false
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: false
+      hibernate.connection.autocommit: false
+      hibernate.generate_statistics: false
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.query.fail_on_pagination_over_collection_fetch: true  # prevents issues, see https://vladmihalcea.com/hibernate-query-fail-on-pagination-over-collection-fetch
+      hibernate.query.in_clause_parameter_padding: true
+      hibernate.jdbc.batch_size: 25
+      hibernate.jdbc.time_zone: UTC
+      hibernate.jdbc.lob.non_contextual_creation: true
+      # limit fetch depth to prevent queries from getting too large because of eager fetching
+      hibernate.max_fetch_depth: 2
 
 server:
   port: 8080

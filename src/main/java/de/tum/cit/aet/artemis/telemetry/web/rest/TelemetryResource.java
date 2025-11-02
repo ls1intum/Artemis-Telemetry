@@ -1,8 +1,8 @@
-package de.tum.cit.ase.artemistelemetry.web.rest;
+package de.tum.cit.aet.artemis.telemetry.web.rest;
 
-import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
-import de.tum.cit.ase.artemistelemetry.service.TelemetryService;
-import de.tum.cit.ase.artemistelemetry.service.dto.TelemetryDTO;
+import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
+import de.tum.cit.aet.artemis.telemetry.service.TelemetryService;
+import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
-package de.tum.cit.ase.artemistelemetry.service.dto;
+package de.tum.cit.aet.artemis.telemetry.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
+import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
 
 import java.time.ZonedDateTime;
 import java.util.List;

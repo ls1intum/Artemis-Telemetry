@@ -1,4 +1,4 @@
-package de.tum.cit.ase.artemistelemetry.security;
+package de.tum.cit.aet.artemis.telemetry.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

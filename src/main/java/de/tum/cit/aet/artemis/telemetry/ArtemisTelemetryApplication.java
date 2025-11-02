@@ -1,4 +1,4 @@
-package de.tum.cit.ase.artemistelemetry;
+package de.tum.cit.aet.artemis.telemetry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

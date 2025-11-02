@@ -1,6 +1,6 @@
-package de.tum.cit.ase.artemistelemetry.repository;
+package de.tum.cit.aet.artemis.telemetry.repository;
 
-import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
+import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

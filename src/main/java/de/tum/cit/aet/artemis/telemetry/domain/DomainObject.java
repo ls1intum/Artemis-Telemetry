@@ -1,4 +1,4 @@
-package de.tum.cit.ase.artemistelemetry.domain;
+package de.tum.cit.aet.artemis.telemetry.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;

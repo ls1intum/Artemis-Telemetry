@@ -1,8 +1,8 @@
-package de.tum.cit.ase.artemistelemetry.service;
+package de.tum.cit.aet.artemis.telemetry.service;
 
-import de.tum.cit.ase.artemistelemetry.domain.Telemetry;
-import de.tum.cit.ase.artemistelemetry.repository.TelemetryRepository;
-import de.tum.cit.ase.artemistelemetry.service.dto.TelemetryDTO;
+import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
+import de.tum.cit.aet.artemis.telemetry.repository.TelemetryRepository;
+import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;

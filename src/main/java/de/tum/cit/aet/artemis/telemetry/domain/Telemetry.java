@@ -1,4 +1,4 @@
-package de.tum.cit.ase.artemistelemetry.domain;
+package de.tum.cit.aet.artemis.telemetry.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
