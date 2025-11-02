@@ -14,7 +14,7 @@ public class ArtemisTelemetryApplication {
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(ArtemisTelemetryApplication.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication app = new SpringApplication(ArtemisTelemetryApplication.class);
         var context = app.run(args);
         Environment env = context.getEnvironment();

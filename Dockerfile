@@ -1,4 +1,4 @@
-FROM gradle:8.7-jdk21 AS build
+FROM gradle:9.2-jdk25 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
@@ -7,7 +7,7 @@ WORKDIR /home/gradle/src
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar
 
-FROM eclipse-temurin:21
+FROM eclipse-temurin:25-jre
 
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/app.jar
