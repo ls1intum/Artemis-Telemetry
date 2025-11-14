@@ -3,6 +3,8 @@ package de.tum.cit.aet.artemis.telemetry.web.rest;
 import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
 import de.tum.cit.aet.artemis.telemetry.service.TelemetryService;
 import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/telemetry")
 public class TelemetryResource {
+
+    private final Logger log = LoggerFactory.getLogger(TelemetryResource.class);
 
     private final TelemetryService telemetryService;
 
@@ -25,6 +29,7 @@ public class TelemetryResource {
 
     @PostMapping
     public ResponseEntity<?> createTelemetry(@RequestBody TelemetryDTO telemetryDTO) {
+        log.info("Received telemetry data: {}", telemetryDTO);
         try {
             telemetryService.validateTelemetry(telemetryDTO);
         } catch (IllegalArgumentException e) {

@@ -8,7 +8,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record TelemetryDTO(Long id, String version, String serverUrl, String operator, String adminName, List<String> profiles, String contact, ZonedDateTime timestamp,
-                           boolean isProductionInstance, boolean isTestServer, boolean isMultiNode, String dataSource, int numberOfNodes, int buildAgentCount) {
+                           Boolean isProductionInstance, Boolean isTestServer, Boolean isMultiNode, String dataSource, int numberOfNodes, int buildAgentCount) {
 
     public static TelemetryDTO from(Telemetry telemetry) {
         List<String> profilesList = List.of(telemetry.getProfiles().split(","));
@@ -40,12 +40,12 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
         telemetry.setProfiles(profiles);
         telemetry.setTimestamp(telemetryDTO.timestamp());
         telemetry.setContact(telemetryDTO.contact());
-        telemetry.setProductionInstance(telemetryDTO.isProductionInstance());
-        telemetry.setTestServer(telemetryDTO.isMultiNode());
+        telemetry.setProductionInstance(Boolean.TRUE.equals(telemetryDTO.isProductionInstance()));
+        telemetry.setTestServer(Boolean.TRUE.equals(telemetryDTO.isMultiNode()));
         telemetry.setDataSource(telemetryDTO.dataSource());
         telemetry.setNumberOfNodes(telemetryDTO.numberOfNodes());
         telemetry.setBuildAgentCount(telemetryDTO.buildAgentCount());
-        telemetry.setTestServer(telemetryDTO.isTestServer());
+        telemetry.setTestServer(Boolean.TRUE.equals(telemetryDTO.isTestServer()));
         return telemetry;
     }
 }
