@@ -7,7 +7,7 @@ WORKDIR /home/gradle/src
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar
 
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:25.0.1_8-jre
 
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/app.jar
