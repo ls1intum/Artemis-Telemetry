@@ -130,7 +130,7 @@
         <div class="section-heading">
             <div>
                 <h2 id="directory-title">Universities & contacts</h2>
-                <p class="muted">One row per instance, grouped by institution name. Details reflect the latest report.</p>
+                <p class="muted">Most recently reported first, up to 50 instances per page. Details reflect the latest report.</p>
             </div>
             <span class="muted">{{ directory().length }} of {{ filtered().length }} instances</span>
         </div>
@@ -141,10 +141,10 @@
                 (ngModelChange)="setHideUnidentified($event)"
                 aria-describedby="directory-filter-help"
             />
-            <span>Hide test and unidentified entries</span>
+            <span>Hide test, staging, and unidentified entries</span>
         </label>
         <p id="directory-filter-help" class="muted directory-filter-note">
-            Hides entries containing “test” in the URL, university, operator, name, or email, and entries with no reported name, email, or university.
+            Hides entries containing “test” or “staging” in the URL, university, operator, name, or email, and entries with no reported name, email, or university.
         </p>
         <div class="table-scroll" tabindex="0" role="region" aria-label="Universities and contact data">
             <table class="directory-table">

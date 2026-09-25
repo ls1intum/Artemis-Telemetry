@@ -69,8 +69,8 @@ export function includeInDirectory(row: Instance): boolean {
     const startup = row.latestStartup;
     const identity = [startup.adminName, startup.contact, startup.universityName];
     const hasIdentity = identity.some((value) => value?.trim());
-    const hasTest = [row.serverUrl, startup.operator, ...identity].some((value) => value?.toLowerCase().includes('test'));
-    return hasIdentity && !hasTest;
+    const hasExcludedText = [row.serverUrl, startup.operator, ...identity].some((value) => /test|staging/i.test(value ?? ''));
+    return hasIdentity && !hasExcludedText;
 }
 
 export function filterInstances(rows: Instance[], search: string, environment: string, days: number, now: number): Instance[] {
