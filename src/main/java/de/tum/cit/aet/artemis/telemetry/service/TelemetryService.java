@@ -52,6 +52,15 @@ public class TelemetryService {
 
     public List<Telemetry> getAll() { return startups.findAll(); }
 
+    /** Returns only the latest report of each visible instance in two bulk queries, not the startup history. */
+    public List<TelemetryInstanceDTO> getDashboard() {
+        var visible = instances.findAllVisible();
+        Map<Long, Telemetry> latest = startups.findAllById(visible.stream().map(i -> i.getLatestStartupId()).toList()).stream()
+                .collect(Collectors.toMap(Telemetry::getId, Function.identity()));
+        return visible.stream().map(i -> new TelemetryInstanceDTO(i.getId(), i.getServerUrl(), i.getFirstSeen(), i.getLastSeen(),
+                TelemetryDTO.from(latest.get(i.getLatestStartupId())))).toList();
+    }
+
     public Page<TelemetryInstanceDTO> getInstances(int page, int size) {
         var result = instances.findVisible(pageRequest(page, size, "lastSeen"));
         Map<Long, Telemetry> latest = startups.findAllById(result.stream().map(i -> i.getLatestStartupId()).toList()).stream()

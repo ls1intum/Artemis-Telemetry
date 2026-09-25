@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T15:56:55.263284+00:00",
+  "title": "Design System: Artemis Telemetry",
+  "extensions": {
+    "colorMeta": {
+      "deep": {
+        "role": "primary",
+        "displayName": "Report Navy"
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "Telemetry Blue"
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Link Blue"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate"
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Divider"
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "Soft Track"
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Border"
+      },
+      "unknown": {
+        "role": "neutral",
+        "displayName": "Unknown Slate"
+      },
+      "table-heading": {
+        "role": "neutral",
+        "displayName": "Table Heading"
+      },
+      "row-hover": {
+        "role": "neutral",
+        "displayName": "Row Hover"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Sign-in introduction."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Dashboard page title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings."
+      },
+      "chart-title": {
+        "displayName": "Chart title",
+        "purpose": "Distribution headings."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Tables and distribution labels; tabular numerals."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "login-settle",
+        "value": "settle 0.3s ease-out",
+        "purpose": "Translate the sign-in form from 8px below to rest, only with prefers-reduced-motion: no-preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "medium",
+        "value": "850px"
+      },
+      {
+        "name": "narrow",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary button using the shared native button treatment.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\">Sign in</button>",
+      "css": ".ds-button-primary{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:16px;line-height:1.5;font-weight:600;border:1px solid transparent;border-radius:5px;padding:9px 16px;min-height:42px;cursor:pointer;background:var(--blue,#176ca4);color:var(--paper,#fff);}.ds-button-primary:not(:disabled):hover{filter:brightness(0.92);}.ds-button-primary:disabled{opacity:0.5;cursor:default;}.ds-button-primary:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary button using the shared native button treatment.",
+      "html": "<button class=\"ds-button-secondary\" type=\"button\">Refresh</button>",
+      "css": ".ds-button-secondary{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:16px;line-height:1.5;font-weight:600;border:1px solid transparent;border-radius:5px;padding:9px 16px;min-height:42px;cursor:pointer;background:var(--paper,#fff);color:var(--ink,#172e46);border-color:#748797;}.ds-button-secondary:not(:disabled):hover{filter:brightness(0.92);}.ds-button-secondary:disabled{opacity:0.5;cursor:default;}.ds-button-secondary:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}"
+    },
+    {
+      "name": "Masthead button",
+      "kind": "button",
+      "refersTo": "button-header",
+      "description": "Masthead button using the shared native button treatment.",
+      "html": "<div class=\"ds-header-surface\"><button class=\"ds-button-header\" type=\"button\">Sign out</button></div>",
+      "css": ".ds-button-header{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:16px;line-height:1.5;font-weight:600;border:1px solid transparent;border-radius:5px;padding:9px 16px;min-height:42px;cursor:pointer;background:transparent;color:#fff;border-color:#5e778d;}.ds-button-header:not(:disabled):hover{filter:brightness(0.92);}.ds-button-header:disabled{opacity:0.5;cursor:default;}.ds-button-header:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}.ds-header-surface{background:var(--deep,#102e49);padding:19px 24px;}"
+    },
+    {
+      "name": "Text action",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Text action using the shared native button treatment.",
+      "html": "<button class=\"ds-button-text\" type=\"button\">History</button>",
+      "css": ".ds-button-text{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:16px;line-height:1.5;font-weight:600;border:1px solid transparent;border-radius:5px;padding:9px 16px;min-height:42px;cursor:pointer;background:transparent;color:#0b639a;padding:8px;text-decoration:underline;text-underline-offset:4px;}.ds-button-text:not(:disabled):hover{filter:brightness(0.92);}.ds-button-text:disabled{opacity:0.5;cursor:default;}.ds-button-text:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}"
+    },
+    {
+      "name": "Labeled input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Visible labels and native text entry.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-search\">Find an installation</label><input id=\"ds-search\" type=\"search\" placeholder=\"University, URL, contact, or version\"></div>",
+      "css": ".ds-field{font-family:'Source Sans 3','Segoe UI',sans-serif;color:var(--ink,#172e46);max-width:520px;}.ds-field label{display:block;font-size:14px;font-weight:600;line-height:1.5;margin-bottom:6px;}.ds-field input{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:16px;line-height:1.5;width:100%;min-height:44px;border:1px solid #748797;border-radius:5px;padding:9px 12px;background:var(--paper,#fff);color:var(--ink,#172e46);caret-color:var(--blue,#176ca4);}.ds-field input::placeholder{color:#62707c;}.ds-field input:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}"
+    },
+    {
+      "name": "Login panel",
+      "kind": "card",
+      "refersTo": "login-panel",
+      "description": "Flat containing surface for sign-in.",
+      "html": "<section class=\"ds-panel\"><h2>Sign in</h2><p>Use your telemetry account to continue.</p></section>",
+      "css": ".ds-panel{font-family:'Source Sans 3','Segoe UI',sans-serif;color:var(--ink,#172e46);line-height:1.5;background:var(--paper,#fff);padding:32px;border:1px solid var(--line,#d8e0e6);border-radius:8px;}.ds-panel h2{margin:0;font-size:23px;font-weight:650;letter-spacing:-0.015em;}.ds-panel p{margin:7px 0 0;font-size:14px;color:var(--muted,#526474);}@media(max-width:850px){.ds-panel{padding:24px;}}"
+    },
+    {
+      "name": "Labeled distribution",
+      "kind": "custom",
+      "refersTo": "chart-bar",
+      "description": "Illustrative category, count, and share with a decorative CSS bar.",
+      "html": "<table class=\"ds-chart\" aria-label=\"Illustrative distribution\"><tbody><tr><th scope=\"row\">Example category</th><td><div class=\"ds-track\" aria-hidden=\"true\"><div class=\"ds-fill\"></div></div></td><td class=\"ds-value\">6 <span>60%</span></td></tr><tr><th scope=\"row\">Not reported</th><td><div class=\"ds-track\" aria-hidden=\"true\"><div class=\"ds-fill ds-unknown\"></div></div></td><td class=\"ds-value\">4 <span>40%</span></td></tr></tbody></table>",
+      "css": ".ds-chart{font-family:'Source Sans 3','Segoe UI',sans-serif;font-size:14px;line-height:1.5;color:var(--ink,#172e46);width:100%;border-collapse:collapse;text-align:left;}.ds-chart th,.ds-chart td{padding:5px 0;}.ds-chart th{width:33%;font-weight:400;overflow-wrap:anywhere;}.ds-track{height:12px;background:var(--soft,#e9f0f5);margin:0 14px;border-radius:2px;overflow:hidden;}.ds-fill{height:100%;width:60%;min-width:2px;background:var(--blue,#176ca4);}.ds-unknown{width:40%;background:#8a9cab;}.ds-value{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}.ds-value span{display:inline-block;width:40px;font-size:12px;margin-left:8px;color:var(--muted,#526474);}"
+    },
+    {
+      "name": "Scrollable data table",
+      "kind": "custom",
+      "refersTo": "table",
+      "description": "Flat table with secondary detail and a keyboard-accessible scroll region; sample content is illustrative.",
+      "html": "<div class=\"ds-table-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"Example installation data\"><table class=\"ds-table\"><thead><tr><th>University / operator</th><th>Infrastructure</th><th>Last reported</th></tr></thead><tbody><tr><td><strong>Example institution</strong><span class=\"ds-detail\">Operator not reported</span></td><td>\u2014 nodes<span class=\"ds-detail\">\u2014 build agents</span></td><td>Not reported</td></tr></tbody></table></div>",
+      "css": ".ds-table-scroll{width:100%;overflow:auto;border:1px solid var(--line,#d8e0e6);border-radius:6px;background:var(--paper,#fff);scrollbar-color:#a7b7c3 var(--soft,#e9f0f5);}.ds-table-scroll:focus-visible{outline:3px solid #b56a00;outline-offset:3px;}.ds-table{font-family:'Source Sans 3','Segoe UI',sans-serif;color:var(--ink,#172e46);width:100%;min-width:520px;border-collapse:collapse;text-align:left;font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums;}.ds-table th{background:#eaf0f4;padding:13px 16px;font-weight:600;white-space:nowrap;}.ds-table td{padding:16px;border-top:1px solid var(--line,#d8e0e6);vertical-align:top;}.ds-table strong{font-weight:600;}.ds-table tbody tr:hover{background:#f7fafc;}.ds-detail{display:block;margin-top:5px;font-size:13px;color:var(--muted,#526474);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Institutional Report",
+    "overview": "An institutional report for maintainers: a navy masthead anchors a light canvas, with compact typography, labeled distributions, and flat data tables. White surfaces and dividing rules establish hierarchy while native controls keep interaction familiar.\n\nThe visual system serves careful reading and comparison. Text carries counts, uncertainty, and action meaning; color reinforces those meanings. The implementation uses self-hosted type, CSS bars, and an inline geometric brand mark without raster imagery.",
+    "keyCharacteristics": [
+      "Restrained navy and blue on a light canvas.",
+      "Flat, bordered surfaces and compact report typography.",
+      "Native controls, visible keyboard focus, and textual chart values."
+    ],
+    "rules": [
+      {
+        "name": "The Text First Rule",
+        "body": "Every distribution retains a category label, count, and percentage; color is supplementary.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "Use tonal contrast and dividing rules to group content; retain the implemented shadow-free surfaces.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do retain visible labels, counts, percentages, and explicit missing-data wording.",
+      "Do keep tables readable through keyboard-accessible horizontal scrolling on narrow screens.",
+      "Do use the shared focus treatment and restore focus when closing history.",
+      "Do use self-hosted Source Sans 3 and the implemented native control styles."
+    ],
+    "donts": [
+      "Don't replace missing data with zero or rely on bar color alone.",
+      "Don't introduce decorative shadows, gradients, or raster imagery into this report layout.",
+      "Don't hide table columns merely to fit a small viewport."
+    ]
+  }
+}

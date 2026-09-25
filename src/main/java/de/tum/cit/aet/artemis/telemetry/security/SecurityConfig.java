@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -27,13 +29,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        AuthenticationEntryPoint entryPoint = (request, response, exception) -> {
+            // Preserve challenge-driven Basic clients; the SPA marks its requests to avoid a native password prompt.
+            if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                response.setHeader("WWW-Authenticate", "Basic realm=\"Artemis Telemetry\"");
+            }
+            response.setStatus(401);
+        };
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/telemetry")))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/telemetry/**").authenticated()
-                        .anyRequest().permitAll()
-                )
-                .httpBasic(httpBasic -> {});
+                        .requestMatchers(HttpMethod.POST, "/api/telemetry").permitAll()
+                        .requestMatchers("/api/auth/session", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll())
+                .requestCache(cache -> cache.disable())
+                .exceptionHandling(errors -> errors.authenticationEntryPoint(entryPoint))
+                .httpBasic(basic -> basic.authenticationEntryPoint(entryPoint))
+                .formLogin(login -> login.loginPage("/").loginProcessingUrl("/api/auth/login")
+                        .successHandler((request, response, authentication) -> response.setStatus(204))
+                        .failureHandler((request, response, exception) -> response.setStatus(401)))
+                .logout(logout -> logout.logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)));
 
         return http.build();
     }

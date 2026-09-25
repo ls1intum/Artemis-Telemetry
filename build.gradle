@@ -39,3 +39,25 @@ dependencies {
 tasks.named("test") {
     useJUnitPlatform()
 }
+
+// The production JAR contains the same-origin Angular client. Docker supplies its prebuilt bundle.
+def skipClient = providers.gradleProperty('skipClient').isPresent()
+tasks.register('clientInstall', Exec) {
+    workingDir 'client'
+    commandLine 'npm', 'ci', '--no-audit', '--no-fund'
+    inputs.files('client/package.json', 'client/package-lock.json')
+    outputs.dir('client/node_modules')
+    onlyIf { !skipClient }
+}
+tasks.register('clientBuild', Exec) {
+    dependsOn 'clientInstall'
+    workingDir 'client'
+    commandLine 'npm', 'run', 'build'
+    inputs.files(fileTree('client') { exclude 'node_modules/**', 'dist/**', '.angular/**' })
+    outputs.dir('client/dist')
+    onlyIf { !skipClient }
+}
+tasks.named('processResources') {
+    dependsOn 'clientBuild'
+    from('client/dist/browser') { into 'static' }
+}

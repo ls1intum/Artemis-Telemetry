@@ -13,6 +13,9 @@ public interface TelemetryInstanceRepository extends JpaRepository<TelemetryInst
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<TelemetryInstance> findByServerUrl(String serverUrl);
 
+    @Query("select i from TelemetryInstance i join Telemetry t on t.id = i.latestStartupId where t.isTestServer = false order by i.lastSeen desc, i.id desc")
+    java.util.List<TelemetryInstance> findAllVisible();
+
     @Query("select i from TelemetryInstance i join Telemetry t on t.id = i.latestStartupId where t.isTestServer = false")
     Page<TelemetryInstance> findVisible(Pageable pageable);
 }

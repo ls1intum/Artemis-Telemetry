@@ -5,3 +5,11 @@ build
 .DS_Store
 config/*.env
 src/test
+
+client/node_modules
+client/dist
+client/.angular
+client/coverage
+client/test-results
+.impeccable/review
+.angular

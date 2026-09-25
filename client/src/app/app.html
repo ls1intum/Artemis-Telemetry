@@ -1,0 +1,264 @@
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="masthead">
+    <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26 16 5l12 21M10 22h12M16 5v21" /></svg
+        ><span>Artemis <strong>Telemetry</strong></span>
+    </div>
+    @if (user()) {
+    <div class="account">
+        <span>{{ user() }}</span><button type="button" class="header-button" (click)="logout()" [disabled]="busy()">Sign out</button>
+    </div>
+    }
+</header>
+<main id="main">
+    @if (initializing()) {
+    <div class="initial-state" role="status">Connecting to telemetry…</div>
+    } @else if (!user()) {
+    <div class="login-layout">
+        <div class="login-intro">
+            <h1>A clearer view<br />of Artemis.</h1>
+            <p>Installations, configurations, and the people behind them.</p>
+            <div class="login-rule"></div>
+            <p class="muted">Private overview for Artemis maintainers.</p>
+        </div>
+        <form class="login-form" (ngSubmit)="login()">
+            <h2>Sign in</h2>
+            <p class="muted">Use your telemetry account to continue.</p>
+            <label for="username">Username</label
+            ><input id="username" name="username" autocomplete="username" [(ngModel)]="username" required [disabled]="busy()" />
+            <label for="password">Password</label
+            ><input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                [(ngModel)]="password"
+                required
+                [disabled]="busy()"
+            />
+            @if (loginError()) {
+            <p class="error" role="alert">{{ loginError() }}</p>
+            }
+            <button class="primary" type="submit" [disabled]="busy() || !username.trim() || !password">
+                {{ busy() ? 'Signing in…' : 'Sign in' }}<span aria-hidden="true">→</span>
+            </button>
+        </form>
+    </div>
+    } @else {
+    <div class="page-heading">
+        <div>
+            <h1>Installation overview</h1>
+            <p class="muted">One snapshot per instance. A shared view of the Artemis community.</p>
+        </div>
+        <button class="secondary" (click)="refresh()" [disabled]="loading()">{{ loading() ? 'Refreshing…' : 'Refresh' }}</button>
+    </div>
+    @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+    }
+    <div class="filters" aria-label="Filter telemetry">
+        <div class="search-field">
+            <label for="search">Find an installation</label
+            ><input
+                id="search"
+                type="search"
+                placeholder="University, URL, contact, or version"
+                [ngModel]="search()"
+                (ngModelChange)="setSearch($event)"
+            />
+        </div>
+        <div>
+            <label for="environment">Environment</label
+            ><select id="environment" [ngModel]="environment()" (ngModelChange)="setEnvironment($event)">
+                <option value="production">Production</option>
+                <option value="all">All environments</option>
+                <option value="other">Non-production / unspecified</option>
+            </select>
+        </div>
+        <div>
+            <label for="recency">Last reported</label
+            ><select id="recency" [ngModel]="days()" (ngModelChange)="setDays($event)">
+                <option [ngValue]="0">Any time</option>
+                <option [ngValue]="30">Past 30 days</option>
+                <option [ngValue]="90">Past 90 days</option>
+                <option [ngValue]="365">Past year</option>
+            </select>
+        </div>
+    </div>
+    @if (loading() && !loadedAt()) {
+    <p class="initial-state" role="status">Loading installation data…</p>
+    } @if (loadedAt()) {
+    <div class="overview-line" aria-live="polite">
+        <p>
+            <strong>{{ filtered().length | number }}</strong> instances <span>/</span> <strong>{{ universities() | number }}</strong> named
+            institutions <span>/</span> <strong>{{ contacts() | number }}</strong> instances with contact details
+        </p>
+        <p class="muted">Retrieved {{ loadedAt() | date:'shortTime' }}</p>
+    </div>
+    <p class="data-note">
+        Latest startup per URL · Test servers excluded · Reports arrive at startup, so “last reported” does not indicate whether a server is
+        online.
+    </p>
+    @if (!filtered().length) {
+    <section class="empty-state">
+        <h2>{{ rows().length ? 'No matching installations' : 'No installations reported yet' }}</h2>
+        <p>
+            {{ rows().length ? 'Try another search or broaden the filters.' : 'Installations will appear after Artemis sends startup
+            telemetry.' }}
+        </p>
+        @if(rows().length) { <button class="secondary" (click)="resetFilters()">Reset filters</button> }
+    </section>
+    } @else {
+    <div class="section-heading">
+        <h2>Across the installations</h2>
+        <span class="muted">Counts and shares of {{ filtered().length }} matching instances</span>
+    </div>
+    <div class="charts-grid">
+        <app-chart title="Artemis versions" description="Latest reported version of each instance." [data]="versions()" />
+        <app-chart
+            title="Module features"
+            description="An instance can enable several modules. Shares may total more than 100%."
+            [data]="modules()"
+        />
+        <app-chart title="Database engines" description="Database used by each instance." [data]="databases()" />
+        <app-chart
+            title="Core-node distribution"
+            description="Connected core nodes at report time. Missing counts stay unknown."
+            [data]="nodes()"
+        />
+    </div>
+    <section class="directory" aria-labelledby="directory-title">
+        <div class="section-heading">
+            <div>
+                <h2 id="directory-title">Universities & contacts</h2>
+                <p class="muted">One row per instance, grouped by institution name. Details reflect the latest report.</p>
+            </div>
+            <span class="muted">{{ directory().length }} instances</span>
+        </div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Universities and contact data">
+            <table class="directory-table">
+                <thead>
+                    <tr>
+                        <th>University / operator</th>
+                        <th>Instance</th>
+                        <th>Contact</th>
+                        <th>Infrastructure</th>
+                        <th>Last reported</th>
+                        <th><span class="sr-only">Startup history</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of visibleRows(); track row.id) {
+                    <tr>
+                        <td>
+                            <strong>{{ institution(row) }}</strong
+                            ><span class="cell-detail">{{ row.latestStartup.operator || 'Operator not reported' }}</span>
+                        </td>
+                        <td>
+                            @if (safeUrl(row.serverUrl); as url) {
+                            <a [href]="url" target="_blank" rel="noopener noreferrer">{{ row.serverUrl }}</a> } @else { {{ row.serverUrl }}
+                            }<span class="cell-detail">{{ row.latestStartup.version || 'Version not reported' }}</span>
+                        </td>
+                        <td>
+                            {{ row.latestStartup.adminName || 'Name not reported' }}<span class="cell-detail"
+                                >@if (contactUrl(row.latestStartup.contact); as email) {
+                                <a [href]="email">{{ row.latestStartup.contact }}</a> } @else { {{ row.latestStartup.contact || 'Email not
+                                reported' }} }</span
+                            >
+                        </td>
+                        <td>
+                            <span>{{ row.latestStartup.numberOfNodes ?? '—' }} nodes</span
+                            ><span class="cell-detail">{{ row.latestStartup.buildAgentCount ?? '—' }} build agents</span>
+                        </td>
+                        <td class="date-cell">
+                            {{ row.lastSeen | date:'mediumDate' }}<span class="cell-detail">{{ row.lastSeen | date:'shortTime' }}</span>
+                        </td>
+                        <td>
+                            <button
+                                class="text-button"
+                                [id]="'history-' + row.id"
+                                (click)="openHistory(row)"
+                                [attr.aria-label]="'View startup history for ' + row.serverUrl"
+                                [attr.aria-expanded]="selected()?.id === row.id"
+                                aria-controls="startup-history"
+                            >
+                                History
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <span>{{ page() * pageSize + 1 }}–{{ page() * pageSize + visibleRows().length }} of {{ directory().length }}</span>
+            <div>
+                <button class="secondary" [disabled]="page() === 0" (click)="page.set(page() - 1)">Previous</button
+                ><span>Page {{ page() + 1 }} of {{ pageCount() }}</span
+                ><button class="secondary" [disabled]="page() + 1 >= pageCount()" (click)="page.set(page() + 1)">Next</button>
+            </div>
+        </div>
+    </section>
+    } } @if (selected(); as row) {
+    <section id="startup-history" tabindex="-1" class="history" aria-labelledby="history-title" aria-live="polite">
+        <div class="section-heading">
+            <div>
+                <h2 id="history-title">Startup history</h2>
+                <p class="muted">{{ row.serverUrl }}</p>
+            </div>
+            <button class="secondary" (click)="closeHistory()">Close history</button>
+        </div>
+        @if (historyLoading()) {
+        <p role="status">Loading startups…</p>
+        } @else if (historyError()) {
+        <p class="error" role="alert">{{ historyError() }}</p>
+        <button class="secondary" (click)="openHistory(row)">Try again</button> } @else if (history(); as data) {
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Startup history">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Received</th>
+                        <th>Started</th>
+                        <th>Version</th>
+                        <th>Nodes</th>
+                        <th>Build agents</th>
+                        <th>Module features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (startup of data.content; track startup.id) {
+                    <tr>
+                        <td>{{ (startup.timestamp | date:'medium') || 'Not reported' }}</td>
+                        <td>{{ (startup.startedAt | date:'medium') || 'Not reported' }}</td>
+                        <td>{{ startup.version }}</td>
+                        <td>{{ startup.numberOfNodes ?? '—' }}</td>
+                        <td>{{ startup.buildAgentCount ?? '—' }}</td>
+                        <td>
+                            {{ startup.moduleFeatures == null ? 'Not reported' : startup.moduleFeatures.length ?
+                            startup.moduleFeatures.join(', ') : 'None enabled' }}
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="6">No startups available.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            <span>{{ data.totalElements }} startup reports</span>
+            <div>
+                <button class="secondary" [disabled]="data.number === 0" (click)="openHistory(row, data.number - 1)">
+                    Previous startups</button
+                ><span>Page {{ data.number + 1 }} of {{ data.totalPages || 1 }}</span
+                ><button class="secondary" [disabled]="data.number + 1 >= data.totalPages" (click)="openHistory(row, data.number + 1)">
+                    Next startups
+                </button>
+            </div>
+        </div>
+        }
+    </section>
+    }
+    <footer>Artemis Telemetry <span>Missing data is shown as “Not reported” or —. All times are local.</span></footer>
+    }
+</main>

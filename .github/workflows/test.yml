@@ -18,5 +18,13 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: gradle
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci --prefix client --no-audit --no-fund
+      - run: npm test --prefix client
+      - run: npm run typecheck --prefix client
       - run: sh scripts/test-database-upgrade.sh
       - run: ./gradlew test bootJar
