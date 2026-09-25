@@ -85,8 +85,8 @@ public class TelemetryService {
     private void validate(TelemetryDTO dto) {
         requireText(dto.operator(), "Operator");
         requireText(dto.version(), "Version");
-        if (dto.profiles() == null || dto.profiles().isEmpty() || dto.profiles().stream().anyMatch(p -> p == null || p.isBlank() || p.contains(","))
-                || String.join(",", dto.profiles()).length() > 255) {
+        if (dto.profiles() != null && (dto.profiles().stream().anyMatch(p -> p == null || p.isBlank() || p.contains(","))
+                || String.join(",", dto.profiles()).length() > 255)) {
             throw new IllegalArgumentException("Profiles must contain non-empty names and fit in 255 characters");
         }
         for (String value : new String[] {dto.adminName(), dto.universityName(), dto.contact()}) {

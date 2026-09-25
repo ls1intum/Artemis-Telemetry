@@ -117,8 +117,8 @@ case remain distinct installations. URLs cannot include credentials, queries or 
 A report can additionally contain `universityName`, `moduleFeatures` (a JSON array),
 `numberOfNodes`, `buildAgentCount`, `isMultiNode`, `startupId` (a UUID), `startedAt`
 (an ISO-8601 timestamp), and `isLocalLLMDeploymentEnabled`. The existing `operator`
-field remains the operator name. Counts and features absent from older payloads remain
-unknown; an empty feature array means no optional module features are enabled.
+field remains the operator name. Missing, `null`, or empty `profiles` and `moduleFeatures`
+arrays are accepted and stored as SQL `NULL`; non-empty arrays retain their values.
 
 The collector owns the receipt `timestamp` and database IDs. Repeated delivery of the
 same `startupId` for the same URL returns the existing report. Legacy reports without

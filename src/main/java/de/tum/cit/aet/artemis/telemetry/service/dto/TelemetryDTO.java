@@ -24,7 +24,7 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
         t.setServerUrl(dto.serverUrl());
         t.setOperatorName(dto.operator());
         t.setAdminName(dto.adminName());
-        t.setProfiles(dto.profiles() == null ? null : String.join(",", dto.profiles()));
+        t.setProfiles(dto.profiles() == null || dto.profiles().isEmpty() ? null : String.join(",", dto.profiles()));
         t.setContact(dto.contact());
         t.setProductionInstance(Boolean.TRUE.equals(dto.isProductionInstance()));
         t.setTestServer(Boolean.TRUE.equals(dto.isTestServer()));
@@ -33,7 +33,7 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
         t.setNumberOfNodes(dto.numberOfNodes());
         t.setBuildAgentCount(dto.buildAgentCount());
         t.setUniversityName(dto.universityName());
-        t.setModuleFeatures(dto.moduleFeatures() == null ? null : List.copyOf(dto.moduleFeatures()));
+        t.setModuleFeatures(dto.moduleFeatures() == null || dto.moduleFeatures().isEmpty() ? null : List.copyOf(dto.moduleFeatures()));
         t.setStartupId(dto.startupId());
         t.setStartedAt(dto.startedAt());
         t.setLocalLLMDeploymentEnabled(dto.isLocalLLMDeploymentEnabled());

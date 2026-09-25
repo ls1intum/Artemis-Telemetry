@@ -191,6 +191,28 @@ class TelemetryIntegrationTest {
                 {"version":"10","serverUrl":"https://post.example?secret=x","operator":"U","profiles":["prod"]}
                 """)).andExpect(status().isBadRequest());
     }
+
+    @Test
+    void acceptsMissingNullAndEmptyProfilesAndStoresNull() throws Exception {
+        var payloads = List.of(
+                "{\"version\":\"10\",\"serverUrl\":\"https://profiles-missing.example\",\"operator\":\"U\"}",
+                "{\"version\":\"10\",\"serverUrl\":\"https://profiles-null.example\",\"operator\":\"U\",\"profiles\":null}",
+                "{\"version\":\"10\",\"serverUrl\":\"https://profiles-empty.example\",\"operator\":\"U\",\"profiles\":[]}");
+        for (String payload : payloads) {
+            mvc.perform(post("/api/telemetry").contentType(MediaType.APPLICATION_JSON).content(payload)).andExpect(status().isOk());
+        }
+        assertThat(jdbc.queryForList("SELECT profiles FROM telemetry WHERE server_url LIKE 'https://profiles-%'", String.class))
+                .containsExactlyInAnyOrder(null, null, null);
+    }
+
+    @Test
+    void storesEmptyModuleFeaturesAsNull() throws Exception {
+        mvc.perform(post("/api/telemetry").contentType(MediaType.APPLICATION_JSON).content("""
+                {"version":"10","serverUrl":"https://empty-module-features.example","operator":"U","profiles":["prod"],"moduleFeatures":[]}
+                """)).andExpect(status().isOk());
+        assertThat(jdbc.queryForObject("SELECT module_features FROM telemetry WHERE server_url='https://empty-module-features.example'", String.class)).isNull();
+    }
+
     @Test
     void browserSessionRequiresLoginAndSupportsLogout() throws Exception {
         mvc.perform(get("/api/dashboard")).andExpect(status().isUnauthorized());
