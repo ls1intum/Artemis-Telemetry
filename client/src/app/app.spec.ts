@@ -13,13 +13,13 @@ function deferred<T>() {
     return { promise, resolve, reject };
 }
 
-const instance = (id: number): Instance => ({
+const instance = (id: number, fields: Partial<Startup> = {}): Instance => ({
     id, serverUrl: `https://instance${id}.example`, firstSeen: '2026-01-01T00:00:00Z', lastSeen: '2026-09-25T00:00:00Z',
-    latestStartup: { id, serverUrl: `https://instance${id}.example` },
+    latestStartup: { id, serverUrl: `https://instance${id}.example`, ...fields },
 });
 const history = (row: Instance): Page<Startup> => ({ content: [row.latestStartup], totalElements: 1, totalPages: 1, number: 0 });
 
-describe('dashboard session and asynchronous responses', () => {
+describe('dashboard', () => {
     let app: AppComponent;
     let api: { dashboard: ReturnType<typeof vi.fn>; history: ReturnType<typeof vi.fn>; logout: ReturnType<typeof vi.fn> };
 
@@ -32,6 +32,51 @@ describe('dashboard session and asynchronous responses', () => {
     });
 
     afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); });
+
+    it('orders versions numerically from newest to oldest regardless of frequency', () => {
+        app.rows.set(['9.9.0', '9.9.0', '9.10.0', '10.0.0', '9.9.2', '9.9.12', undefined].map(
+            (version, id) => instance(id, { version }),
+        ));
+        expect(app.versions().map(v => v.label)).toEqual(['10.0.0', '9.10.0', '9.9.12', '9.9.2', '9.9.0', 'Not reported']);
+        expect(app.versions().find(v => v.label === '9.9.0')?.count).toBe(2);
+    });
+
+    it('orders prereleases below their release with numeric prerelease identifiers', () => {
+        app.rows.set(['9.9.0-rc.2', '9.9.0-SNAPSHOT', '9.9.0', '9.9.0-rc.10', '9.9.0-2', 'v9.10.0+build.1', 'develop', undefined].map(
+            (version, id) => instance(id, { version }),
+        ));
+        expect(app.versions().map(v => v.label)).toEqual([
+            'v9.10.0+build.1', '9.9.0', '9.9.0-rc.10', '9.9.0-rc.2', '9.9.0-SNAPSHOT', '9.9.0-2', 'develop', 'Not reported',
+        ]);
+    });
+
+    it('hides test matches in each identity field and fully unidentified entries by default', () => {
+        app.rows.set([
+            instance(1, { universityName: 'Example University' }),
+            instance(2, { adminName: 'Ada' }),
+            instance(3, { contact: 'admin@example.org' }),
+            instance(4),
+            instance(5, { universityName: '  ', adminName: '\t', contact: '' }),
+            { ...instance(6, { adminName: 'Ada' }), serverUrl: 'https://TEST.example.org' },
+            instance(7, { universityName: 'Test University' }),
+            instance(8, { universityName: 'Example University', operator: 'Testing Group' }),
+            instance(9, { adminName: 'Test Admin' }),
+            instance(10, { contact: 'test@example.org' }),
+        ]);
+        expect(app.directory().map(row => row.id).sort((a, b) => a - b)).toEqual([1, 2, 3]);
+        expect(app.filtered()).toHaveLength(10);
+    });
+
+    it('allows hidden directory entries to be shown and resets pagination when toggled', () => {
+        app.rows.set(Array.from({ length: 20 }, (_, id) => instance(id)));
+        expect(app.directory()).toHaveLength(0);
+        app.setHideUnidentified(false);
+        expect(app.directory()).toHaveLength(20);
+        app.page.set(1);
+        app.setHideUnidentified(true);
+        expect(app.page()).toBe(0);
+        expect(app.directory()).toHaveLength(0);
+    });
 
     it('keeps the newest refresh when responses arrive out of order', async () => {
         const older = deferred<Instance[]>();

@@ -113,7 +113,7 @@
         <span class="muted">Counts and shares of {{ filtered().length }} matching instances</span>
     </div>
     <div class="charts-grid">
-        <app-chart title="Artemis versions" description="Latest reported version of each instance." [data]="versions()" />
+        <app-chart title="Artemis versions" description="Latest reported version of each instance, newest to oldest." [data]="versions()" />
         <app-chart
             title="Module features"
             description="An instance can enable several modules. Shares may total more than 100%."
@@ -132,8 +132,20 @@
                 <h2 id="directory-title">Universities & contacts</h2>
                 <p class="muted">One row per instance, grouped by institution name. Details reflect the latest report.</p>
             </div>
-            <span class="muted">{{ directory().length }} instances</span>
+            <span class="muted">{{ directory().length }} of {{ filtered().length }} instances</span>
         </div>
+        <label class="directory-filter">
+            <input
+                type="checkbox"
+                [ngModel]="hideUnidentified()"
+                (ngModelChange)="setHideUnidentified($event)"
+                aria-describedby="directory-filter-help"
+            />
+            <span>Hide test and unidentified entries</span>
+        </label>
+        <p id="directory-filter-help" class="muted directory-filter-note">
+            Hides entries containing “test” in the URL, university, operator, name, or email, and entries with no reported name, email, or university.
+        </p>
         <div class="table-scroll" tabindex="0" role="region" aria-label="Universities and contact data">
             <table class="directory-table">
                 <thead>
@@ -185,10 +197,15 @@
                             </button>
                         </td>
                     </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="6">No entries match the directory filter. Turn it off to show all matching instances.</td>
+                    </tr>
                     }
                 </tbody>
             </table>
         </div>
+        @if (directory().length) {
         <div class="pagination">
             <span>{{ page() * pageSize + 1 }}–{{ page() * pageSize + visibleRows().length }} of {{ directory().length }}</span>
             <div>
@@ -197,6 +214,7 @@
                 ><button class="secondary" [disabled]="page() + 1 >= pageCount()" (click)="page.set(page() + 1)">Next</button>
             </div>
         </div>
+        }
     </section>
     } } @if (selected(); as row) {
     <section id="startup-history" tabindex="-1" class="history" aria-labelledby="history-title" aria-live="polite">

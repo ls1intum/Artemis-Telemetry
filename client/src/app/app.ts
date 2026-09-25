@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Api } from './api';
 import { ChartComponent } from './chart';
-import { contactUrl, distribution, filterInstances, moduleDistribution, safeUrl } from './data';
+import { compareVersions, contactUrl, distribution, filterInstances, includeInDirectory, moduleDistribution, safeUrl } from './data';
 import { Instance, Page, Startup } from './models';
 
 @Component({
@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
     search = signal('');
     environment = signal('all');
     days = signal(0);
+    hideUnidentified = signal(true);
     page = signal(0);
     selected = signal<Instance | null>(null);
     history = signal<Page<Startup> | null>(null);
@@ -42,9 +43,9 @@ export class AppComponent implements OnInit {
         filterInstances(this.rows(), this.search(), this.environment(), this.days(), this.loadedAt()?.getTime() ?? Date.now()),
     );
     directory = computed(() =>
-        [...this.filtered()].sort(
-            (a, b) => this.institution(a).localeCompare(this.institution(b)) || a.serverUrl.localeCompare(b.serverUrl),
-        ),
+        this.filtered()
+            .filter((row) => !this.hideUnidentified() || includeInDirectory(row))
+            .sort((a, b) => this.institution(a).localeCompare(this.institution(b)) || a.serverUrl.localeCompare(b.serverUrl)),
     );
     pageCount = computed(() => Math.ceil(this.directory().length / this.pageSize));
     visibleRows = computed(() => this.directory().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
@@ -57,7 +58,9 @@ export class AppComponent implements OnInit {
             ).size,
     );
     contacts = computed(() => this.filtered().filter((i) => i.latestStartup.contact?.trim()).length);
-    versions = computed(() => distribution(this.filtered(), (i) => i.latestStartup.version));
+    versions = computed(() =>
+        distribution(this.filtered(), (i) => i.latestStartup.version).sort((a, b) => compareVersions(a.label, b.label)),
+    );
     modules = computed(() => moduleDistribution(this.filtered()));
     databases = computed(() => distribution(this.filtered(), (i) => i.latestStartup.dataSource));
     nodes = computed(() =>
@@ -157,6 +160,10 @@ export class AppComponent implements OnInit {
     }
     setDays(value: number) {
         this.days.set(Number(value));
+        this.page.set(0);
+    }
+    setHideUnidentified(value: boolean) {
+        this.hideUnidentified.set(value);
         this.page.set(0);
     }
     resetFilters() {
