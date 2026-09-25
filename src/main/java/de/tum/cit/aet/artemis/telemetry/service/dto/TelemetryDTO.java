@@ -2,50 +2,41 @@ package de.tum.cit.aet.artemis.telemetry.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record TelemetryDTO(Long id, String version, String serverUrl, String operator, String adminName, List<String> profiles, String contact, ZonedDateTime timestamp,
-                           Boolean isProductionInstance, Boolean isTestServer, Boolean isMultiNode, String dataSource, Integer numberOfNodes, Integer buildAgentCount) {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record TelemetryDTO(Long id, String version, String serverUrl, String operator, String adminName, List<String> profiles, String contact,
+        ZonedDateTime timestamp, Boolean isProductionInstance, Boolean isTestServer, Boolean isMultiNode, String dataSource,
+        Integer numberOfNodes, Integer buildAgentCount, String universityName, List<String> moduleFeatures, String startupId,
+        ZonedDateTime startedAt, Boolean isLocalLLMDeploymentEnabled) {
 
-    public static TelemetryDTO from(Telemetry telemetry) {
-        List<String> profilesList = List.of(telemetry.getProfiles().split(","));
-        return new TelemetryDTO(
-                telemetry.getId(),
-                telemetry.getVersion(),
-                telemetry.getServerUrl(),
-                telemetry.getOperatorName(),
-                telemetry.getAdminName(),
-                profilesList,
-                telemetry.getContact(),
-                telemetry.getTimestamp(),
-                telemetry.isProductionInstance(),
-                telemetry.isTestServer(),
-                telemetry.isMultiNode(),
-                telemetry.getDataSource(),
-                telemetry.getNumberOfNodes(),
-                telemetry.getBuildAgentCount());
+    public static TelemetryDTO from(Telemetry t) {
+        return new TelemetryDTO(t.getId(), t.getVersion(), t.getServerUrl(), t.getOperatorName(), t.getAdminName(),
+                t.getProfiles() == null || t.getProfiles().isEmpty() ? List.of() : List.of(t.getProfiles().split(",")), t.getContact(), t.getTimestamp(),
+                t.isProductionInstance(), t.isTestServer(), t.isMultiNode(), t.getDataSource(), t.getNumberOfNodes(), t.getBuildAgentCount(),
+                t.getUniversityName(), t.getModuleFeatures(), t.getStartupId(), t.getStartedAt(), t.getLocalLLMDeploymentEnabled());
     }
 
-    public static Telemetry to(TelemetryDTO telemetryDTO) {
-        String profiles = String.join(",", telemetryDTO.profiles());
-        Telemetry telemetry = new Telemetry();
-        telemetry.setId(telemetryDTO.id());
-        telemetry.setVersion(telemetryDTO.version());
-        telemetry.setServerUrl(telemetryDTO.serverUrl());
-        telemetry.setOperatorName(telemetryDTO.operator());
-        telemetry.setAdminName(telemetryDTO.adminName());
-        telemetry.setProfiles(profiles);
-        telemetry.setTimestamp(telemetryDTO.timestamp());
-        telemetry.setContact(telemetryDTO.contact());
-        telemetry.setProductionInstance(Boolean.TRUE.equals(telemetryDTO.isProductionInstance()));
-        telemetry.setTestServer(Boolean.TRUE.equals(telemetryDTO.isMultiNode()));
-        telemetry.setDataSource(telemetryDTO.dataSource());
-        telemetry.setNumberOfNodes(telemetryDTO.numberOfNodes() == null ? 0 : telemetryDTO.numberOfNodes());
-        telemetry.setBuildAgentCount(telemetryDTO.buildAgentCount() == null ? 0 : telemetryDTO.buildAgentCount());
-        telemetry.setTestServer(Boolean.TRUE.equals(telemetryDTO.isTestServer()));
-        return telemetry;
+    public static Telemetry to(TelemetryDTO dto) {
+        Telemetry t = new Telemetry();
+        t.setVersion(dto.version());
+        t.setServerUrl(dto.serverUrl());
+        t.setOperatorName(dto.operator());
+        t.setAdminName(dto.adminName());
+        t.setProfiles(dto.profiles() == null ? null : String.join(",", dto.profiles()));
+        t.setContact(dto.contact());
+        t.setProductionInstance(Boolean.TRUE.equals(dto.isProductionInstance()));
+        t.setTestServer(Boolean.TRUE.equals(dto.isTestServer()));
+        t.setMultiNode(dto.isMultiNode());
+        t.setDataSource(dto.dataSource());
+        t.setNumberOfNodes(dto.numberOfNodes());
+        t.setBuildAgentCount(dto.buildAgentCount());
+        t.setUniversityName(dto.universityName());
+        t.setModuleFeatures(dto.moduleFeatures() == null ? null : List.copyOf(dto.moduleFeatures()));
+        t.setStartupId(dto.startupId());
+        t.setStartedAt(dto.startedAt());
+        t.setLocalLLMDeploymentEnabled(dto.isLocalLLMDeploymentEnabled());
+        return t;
     }
 }
