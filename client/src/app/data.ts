@@ -69,7 +69,9 @@ export function includeInDirectory(row: Instance): boolean {
     const startup = row.latestStartup;
     const identity = [startup.adminName, startup.contact, startup.universityName];
     const hasIdentity = identity.some((value) => value?.trim());
-    const hasExcludedText = [row.serverUrl, startup.operator, ...identity].some((value) => /test|staging/i.test(value ?? ''));
+    const hasExcludedText = [row.serverUrl, startup.operator, ...identity].some((value) =>
+        /test|staging|stud\.k8s\.aet\.cit\.tum\.de/i.test(value ?? ''),
+    );
     return hasIdentity && !hasExcludedText;
 }
 

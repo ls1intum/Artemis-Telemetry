@@ -93,6 +93,18 @@ describe('dashboard', () => {
         expect(app.directory()).toHaveLength(6);
     });
 
+    it('excludes stud.k8s.aet.cit.tum.de instances until the filter is disabled', () => {
+        app.rows.set([
+            instance(1, { universityName: 'Example University' }),
+            { ...instance(2, { universityName: 'TUM' }), serverUrl: 'https://stud.k8s.aet.cit.tum.de' },
+            { ...instance(3, { adminName: 'Ada' }), serverUrl: 'https://STUD.K8S.AET.CIT.TUM.DE/artemis' },
+        ]);
+        expect(app.directory().map((row) => row.id)).toEqual([1]);
+        expect(app.filtered()).toHaveLength(3);
+        app.setHideUnidentified(false);
+        expect(app.directory().map((row) => row.id)).toEqual([1, 2, 3]);
+    });
+
     it('preserves the API newest-first order, including submillisecond report times', () => {
         app.rows.set([
             { ...instance(4, { universityName: 'Y' }), lastSeen: '2026-09-25T15:00:00+02:00' },
