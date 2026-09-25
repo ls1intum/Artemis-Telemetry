@@ -44,5 +44,4 @@ client/.angular/
 client/coverage/
 client/test-results/
 config/*.env
-.impeccable/review/
 .angular/

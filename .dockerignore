@@ -11,5 +11,4 @@ client/dist
 client/.angular
 client/coverage
 client/test-results
-.impeccable/review
 .angular
