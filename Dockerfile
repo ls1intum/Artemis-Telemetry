@@ -16,7 +16,7 @@ COPY --from=client /client/dist /home/gradle/src/client/dist
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar -PskipClient
 
-FROM eclipse-temurin:25.0.4_7-jre
+FROM eclipse-temurin:26.0.2_10-jre
 
 RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && mkdir /app
