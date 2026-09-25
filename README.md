@@ -13,7 +13,8 @@ to narrow the view to production.
 Artemis versions are ordered numerically from newest to oldest, with releases before
 their prereleases and unreported versions last. The directory additionally hides entries
 containing “test” or “staging” (case-insensitive) in their URL, university, operator, name, or email,
-and entries missing all three of name, email, and university. This directory-only filter
+instances whose URL contains `stud.k8s.aet.cit.tum.de`, and entries missing all three of name,
+email, and university. This directory-only filter
 is enabled by default and can be switched off to show every matching entry. The directory
 is sorted by last reported, newest first, with up to 50 entries per page.
 
