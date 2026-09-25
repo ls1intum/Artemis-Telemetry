@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "telemetry")
@@ -38,16 +41,16 @@ public class Telemetry extends DomainObject {
     private boolean isTestServer;
 
     @Column(name = "is_multi_node")
-    private boolean isMultiNode;
+    private Boolean isMultiNode;
 
     @Column(name = "datasource")
     private String dataSource;
 
     @Column(name = "number_of_nodes")
-    private int numberOfNodes;
+    private Integer numberOfNodes;
 
     @Column(name = "build_agent_count")
-    private int buildAgentCount;
+    private Integer buildAgentCount;
 
     public String getProfiles() {
         return profiles;
@@ -113,11 +116,11 @@ public class Telemetry extends DomainObject {
         isProductionInstance = productionInstance;
     }
 
-    public int getNumberOfNodes() {
+    public Integer getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+    public void setNumberOfNodes(Integer numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
     }
 
@@ -129,11 +132,11 @@ public class Telemetry extends DomainObject {
         this.dataSource = dataSource;
     }
 
-    public int getBuildAgentCount() {
+    public Integer getBuildAgentCount() {
         return buildAgentCount;
     }
 
-    public void setBuildAgentCount(int buildAgentCount) {
+    public void setBuildAgentCount(Integer buildAgentCount) {
         this.buildAgentCount = buildAgentCount;
     }
 
@@ -145,11 +148,54 @@ public class Telemetry extends DomainObject {
         isTestServer = testServer;
     }
 
-    public boolean isMultiNode() {
+    public Boolean isMultiNode() {
         return isMultiNode;
     }
 
-    public void setMultiNode(boolean multiNode) {
+    public void setMultiNode(Boolean multiNode) {
         isMultiNode = multiNode;
     }
+
+    @Column(name = "instance_id")
+    private Long instanceId;
+
+    public Long getInstanceId() { return instanceId; }
+
+    public void setInstanceId(Long instanceId) { this.instanceId = instanceId; }
+
+    @Column(name = "university_name")
+    private String universityName;
+
+    public String getUniversityName() { return universityName; }
+
+    public void setUniversityName(String universityName) { this.universityName = universityName; }
+
+    @Column(name = "startup_id")
+    private String startupId;
+
+    public String getStartupId() { return startupId; }
+
+    public void setStartupId(String startupId) { this.startupId = startupId; }
+
+    @Column(name = "started_at")
+    private ZonedDateTime startedAt;
+
+    public ZonedDateTime getStartedAt() { return startedAt; }
+
+    public void setStartedAt(ZonedDateTime startedAt) { this.startedAt = startedAt; }
+
+    @Column(name = "local_llm_deployment_enabled")
+    private Boolean localLLMDeploymentEnabled;
+
+    public Boolean getLocalLLMDeploymentEnabled() { return localLLMDeploymentEnabled; }
+
+    public void setLocalLLMDeploymentEnabled(Boolean localLLMDeploymentEnabled) { this.localLLMDeploymentEnabled = localLLMDeploymentEnabled; }
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "module_features")
+    private List<String> moduleFeatures;
+
+    public List<String> getModuleFeatures() { return moduleFeatures; }
+
+    public void setModuleFeatures(List<String> moduleFeatures) { this.moduleFeatures = moduleFeatures; }
 }

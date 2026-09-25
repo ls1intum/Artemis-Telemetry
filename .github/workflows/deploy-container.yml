@@ -11,12 +11,12 @@ jobs:
       url: https://telemetry.artemis.cit.tum.de
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.1
         with:
           ref: main
 
       - name: Copy docker-compose to server
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ vars.URL }}
           username: ${{ secrets.SSH_USER }}
@@ -25,11 +25,11 @@ jobs:
           proxy_username: ${{ vars.DEPLOYMENT_GATEWAY_USER }}
           proxy_key: ${{ secrets.DEPLOYMENT_GATEWAY_SSH_KEY }}
           proxy_port: ${{ vars.DEPLOYMENT_GATEWAY_PORT }}
-          source: 'docker-compose.yml'
+          source: 'docker-compose.yml,scripts/check-database-upgrade.sh'
           target: '/opt/artemis-telemetry'
 
       - name: Copy docker-compose to server
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ vars.URL }}
           username: ${{ secrets.SSH_USER }}
@@ -42,7 +42,7 @@ jobs:
           target: '/opt/artemis-telemetry'
 
       - name: Start Telemetry App
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ vars.URL }}
           username: ${{ secrets.SSH_USER }}
@@ -52,5 +52,7 @@ jobs:
           proxy_key: ${{ secrets.DEPLOYMENT_GATEWAY_SSH_KEY }}
           proxy_port: ${{ vars.DEPLOYMENT_GATEWAY_PORT }}
           script: |
+            set -eu
+            sh /opt/artemis-telemetry/scripts/check-database-upgrade.sh
             docker-compose -f /opt/artemis-telemetry/docker-compose.yml -f /opt/artemis-telemetry/docker-compose.prod.yml pull
             docker-compose -f /opt/artemis-telemetry/docker-compose.yml -f /opt/artemis-telemetry/docker-compose.prod.yml up -d --remove-orphans --force-recreate

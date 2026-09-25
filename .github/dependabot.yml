@@ -4,25 +4,15 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-    target-branch: 'develop'
-    open-pull-requests-limit: 10
-  - package-ecosystem: 'npm'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-    target-branch: 'develop'
-    groups:
-      angular:
-        patterns:
-          - '@angular/*'
+    target-branch: 'main'
     open-pull-requests-limit: 10
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
-    target-branch: 'develop'
+    target-branch: 'main'
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
       interval: 'weekly'
-    target-branch: 'develop'
+    target-branch: 'main'

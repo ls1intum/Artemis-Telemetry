@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+ <changeSet id="20260925160000-1-instances" author="krusche">
+  <createTable tableName="telemetry_instance">
+   <column name="id" type="bigint" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+   <column name="server_url" type="varchar(255)"><constraints nullable="false"/></column>
+   <column name="first_seen" type="datetime(6)"/>
+   <column name="last_seen" type="datetime(6)"/>
+   <column name="latest_startup_id" type="bigint"/>
+  </createTable>
+  <!-- URL path case is significant, even with the database's case-insensitive default. -->
+  <sql dbms="mysql">ALTER TABLE telemetry_instance MODIFY server_url VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL</sql>
+  <addUniqueConstraint tableName="telemetry_instance" columnNames="server_url" constraintName="uk_telemetry_instance_url"/>
+  <addColumn tableName="telemetry">
+   <column name="instance_id" type="bigint"/>
+   <column name="university_name" type="varchar(255)"/>
+   <column name="module_features" type="json"/>
+   <column name="startup_id" type="varchar(36)"/>
+   <column name="started_at" type="datetime(6)"/>
+   <column name="local_llm_deployment_enabled" type="boolean"/>
+  </addColumn>
+  <addForeignKeyConstraint baseTableName="telemetry" baseColumnNames="instance_id" referencedTableName="telemetry_instance" referencedColumnNames="id" constraintName="fk_startup_instance"/>
+  <addForeignKeyConstraint baseTableName="telemetry_instance" baseColumnNames="latest_startup_id" referencedTableName="telemetry" referencedColumnNames="id" constraintName="fk_instance_latest_startup"/>
+  <addUniqueConstraint tableName="telemetry" columnNames="instance_id,startup_id" constraintName="uk_instance_startup"/>
+  <createIndex tableName="telemetry" indexName="idx_startup_instance_timestamp"><column name="instance_id"/><column name="timestamp"/><column name="id"/></createIndex>
+ </changeSet>
+ <changeSet id="20260925160000-2-backfill" author="krusche">
+  <customChange class="de.tum.cit.aet.artemis.telemetry.config.migration.BackfillTelemetryInstances"/>
+  <!-- Preserve the historical reports when rolling the data migration back. -->
+  <rollback>
+   <sql>UPDATE telemetry_instance SET latest_startup_id = NULL</sql>
+   <sql>UPDATE telemetry SET instance_id = NULL</sql>
+   <delete tableName="telemetry_instance"/>
+  </rollback>
+ </changeSet>
+</databaseChangeLog>

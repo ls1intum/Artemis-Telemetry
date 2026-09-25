@@ -1,4 +1,4 @@
-FROM gradle:9.3-jdk25 AS build
+FROM gradle:9.8.0-jdk25 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
@@ -7,9 +7,10 @@ WORKDIR /home/gradle/src
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar
 
-FROM eclipse-temurin:25.0.1_8-jre
+FROM eclipse-temurin:25.0.4_7-jre
 
-RUN mkdir /app
+RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
+    && mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/app.jar
 
 EXPOSE 8080
