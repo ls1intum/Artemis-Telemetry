@@ -38,14 +38,14 @@ export class AppComponent implements OnInit {
     password = '';
     safeUrl = safeUrl;
     contactUrl = contactUrl;
-    readonly pageSize = 15;
+    readonly pageSize = 50;
     filtered = computed(() =>
         filterInstances(this.rows(), this.search(), this.environment(), this.days(), this.loadedAt()?.getTime() ?? Date.now()),
     );
     directory = computed(() =>
         this.filtered()
             .filter((row) => !this.hideUnidentified() || includeInDirectory(row))
-            .sort((a, b) => this.institution(a).localeCompare(this.institution(b)) || a.serverUrl.localeCompare(b.serverUrl)),
+            .sort((a, b) => Date.parse(b.lastSeen) - Date.parse(a.lastSeen) || b.id - a.id),
     );
     pageCount = computed(() => Math.ceil(this.directory().length / this.pageSize));
     visibleRows = computed(() => this.directory().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));

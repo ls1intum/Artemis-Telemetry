@@ -68,14 +68,54 @@ describe('dashboard', () => {
     });
 
     it('allows hidden directory entries to be shown and resets pagination when toggled', () => {
-        app.rows.set(Array.from({ length: 20 }, (_, id) => instance(id)));
+        app.rows.set(Array.from({ length: 51 }, (_, id) => instance(id)));
         expect(app.directory()).toHaveLength(0);
         app.setHideUnidentified(false);
-        expect(app.directory()).toHaveLength(20);
+        expect(app.directory()).toHaveLength(51);
         app.page.set(1);
         app.setHideUnidentified(true);
         expect(app.page()).toBe(0);
         expect(app.directory()).toHaveLength(0);
+    });
+
+    it('excludes staging matches in every identity field until the filter is disabled', () => {
+        app.rows.set([
+            instance(1, { universityName: 'Example University' }),
+            { ...instance(2, { adminName: 'Ada' }), serverUrl: 'https://STAGING.example.org' },
+            instance(3, { universityName: 'Staging University' }),
+            instance(4, { universityName: 'Example University', operator: 'Staging Operator' }),
+            instance(5, { adminName: 'StAgInG Admin' }),
+            instance(6, { contact: 'staging@example.org' }),
+        ]);
+        expect(app.directory().map(row => row.id)).toEqual([1]);
+        expect(app.filtered()).toHaveLength(6);
+        app.setHideUnidentified(false);
+        expect(app.directory()).toHaveLength(6);
+    });
+
+    it('sorts the directory by report instant descending, with stable ordering for ties', () => {
+        app.rows.set([
+            { ...instance(1, { universityName: 'A' }), lastSeen: '2026-09-25T12:00:00Z' },
+            { ...instance(2, { universityName: 'Z' }), lastSeen: '2026-09-25T13:00:00Z' },
+            { ...instance(3, { universityName: 'B' }), lastSeen: '2026-09-25T14:30:00+02:00' },
+            { ...instance(4, { universityName: 'Y' }), lastSeen: '2026-09-25T15:00:00+02:00' },
+        ]);
+        expect(app.directory().map(row => row.id)).toEqual([4, 2, 3, 1]);
+    });
+
+    it('shows 50 instances on the first page and the remainder on the next page', () => {
+        app.rows.set(Array.from({ length: 51 }, (_, id) => ({
+            ...instance(id, { universityName: 'Example University' }),
+            lastSeen: new Date(Date.UTC(2026, 8, 25, 0, id)).toISOString(),
+        })));
+        expect(app.pageCount()).toBe(2);
+        expect(app.visibleRows()).toHaveLength(50);
+        expect(app.visibleRows()[0].id).toBe(50);
+        expect(app.visibleRows()[49].id).toBe(1);
+        app.page.set(1);
+        expect(app.visibleRows().map(row => row.id)).toEqual([0]);
+        app.page.set(0);
+        expect(app.visibleRows()).toHaveLength(50);
     });
 
     it('keeps the newest refresh when responses arrive out of order', async () => {
