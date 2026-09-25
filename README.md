@@ -1,3 +1,61 @@
+# Artemis Telemetry
+
+## Private dashboard
+
+Open `/` on the telemetry server for the Angular **22.2.0** dashboard. It shows version,
+module-feature, database, and core-node distributions, a searchable university/contact
+directory, and paginated startup history. Every distribution counts each URL once using
+its latest report. Test instances are excluded; missing information stays unknown.
+Filters apply to the charts and directory together. “Last reported” is a startup receipt,
+not an uptime signal. The initial view includes all known non-test instances; use the environment selector
+to narrow the view to production.
+
+### Single account
+
+The dashboard reuses the existing configured account. There is no registration, account
+database, or user-management screen. Set these in the VM's `config/telemetry.env` (already
+loaded by Docker Compose):
+
+```dotenv
+TELEMETRY_USER=your-username
+TELEMETRY_PASSWORD=your-long-unique-password
+```
+
+Alternatively configure `telemetry.user` and `telemetry.password` in an external Spring
+YAML file. Keep actual credentials out of Git. Restart the container after changing them.
+Existing installations with these properties set require no additional credentials.
+
+The browser uses an HttpOnly, SameSite=Lax session cookie with a 30-minute inactivity
+timeout. Login/logout require CSRF tokens, and credentials are not saved in localStorage
+or sessionStorage. The production Compose override explicitly sets `SERVER_SERVLET_SESSION_COOKIE_SECURE=true`
+so the browser only sends the session cookie over HTTPS. The nginx proxy also supplies
+HTTPS forwarding headers. Local HTTP development leaves Secure disabled. Bind the backend to loopback or a trusted proxy;
+do not expose a directly reachable HTTP backend in production. Signing out invalidates
+the session. HTTP Basic remains supported for existing read-only API clients.
+
+### Local development and builds
+
+Use Java 25, Docker (for tests), and Node **24.21.0** (or an Angular-compatible version).
+
+```sh
+npm ci --prefix client
+npm start --prefix client        # http://localhost:4200, proxies /api to localhost:8080
+./gradlew bootRun                # provide database and account configuration via env/YAML
+npm test --prefix client
+npm run typecheck --prefix client
+./gradlew test bootJar           # builds and packages Angular into the executable JAR
+```
+
+`docker build .` builds Angular in a Node stage, then packages it in the Java image.
+There is no extra frontend container. The existing proxy and deployment workflow serve
+both UI and API at the same origin. `-PskipClient` is for Docker's prebuilt client only;
+normal local JAR builds compile the client automatically.
+
+The authenticated `GET /api/dashboard` endpoint returns only the latest snapshot for
+each visible instance in two bulk database queries. It never loads the full history.
+Contacts are taken from the current report, so a later administrator-details opt-out
+does not resurrect older contact data in the directory.
+
 Use `docker compose up` for quick start.
 
 ## Development

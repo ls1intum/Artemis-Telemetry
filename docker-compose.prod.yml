@@ -1,4 +1,8 @@
 services:
+  telemetry:
+    environment:
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "true"
+
   nginx:
     container_name: nginx
     image: nginx:1.31.6-alpine-slim

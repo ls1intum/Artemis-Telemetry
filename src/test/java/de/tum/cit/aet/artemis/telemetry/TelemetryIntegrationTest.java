@@ -191,4 +191,62 @@ class TelemetryIntegrationTest {
                 {"version":"10","serverUrl":"https://post.example?secret=x","operator":"U","profiles":["prod"]}
                 """)).andExpect(status().isBadRequest());
     }
+    @Test
+    void browserSessionRequiresLoginAndSupportsLogout() throws Exception {
+        mvc.perform(get("/api/dashboard")).andExpect(status().isUnauthorized());
+        var anonymous = mvc.perform(get("/api/auth/session")).andExpect(status().isOk()).andReturn();
+        var session = (org.springframework.mock.web.MockHttpSession) anonymous.getRequest().getSession(false);
+        var token = mapper.readTree(anonymous.getResponse().getContentAsString()).get("csrfToken").asText();
+        mvc.perform(post("/api/auth/login").session(session).param("username", "test").param("password", "test"))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token).param("username", "test").param("password", "wrong"))
+                .andExpect(status().isUnauthorized());
+        var login = mvc.perform(post("/api/auth/login").session(session).header("X-CSRF-TOKEN", token).param("username", "test").param("password", "test"))
+                .andExpect(status().isNoContent()).andReturn();
+        var authenticated = (org.springframework.mock.web.MockHttpSession) login.getRequest().getSession(false);
+        mvc.perform(get("/api/dashboard").session(authenticated)).andExpect(status().isOk());
+        var current = mvc.perform(get("/api/auth/session").session(authenticated)).andExpect(status().isOk()).andReturn();
+        var data = mapper.readTree(current.getResponse().getContentAsString());
+        assertThat(data.get("authenticated").asBoolean()).isTrue();
+        assertThat(data.get("username").asText()).isEqualTo("test");
+        mvc.perform(post("/api/auth/logout").session(authenticated).header("X-CSRF-TOKEN", data.get("csrfToken").asText())).andExpect(status().isNoContent());
+        assertThat(authenticated.isInvalid()).isTrue();
+        mvc.perform(get("/api/dashboard")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void dashboardContainsOnlyLatestReportPerVisibleInstance() throws Exception {
+        String url = "https://dashboard.example";
+        service.record(report(url, UUID.randomUUID().toString(), ZonedDateTime.now().minusHours(2)));
+        var latest = service.record(report(url, UUID.randomUUID().toString(), ZonedDateTime.now().minusHours(1)));
+        var response = mvc.perform(get("/api/dashboard").with(httpBasic("test", "test"))).andExpect(status().isOk()).andReturn();
+        var rows = mapper.readTree(response.getResponse().getContentAsString());
+        var matching = new java.util.ArrayList<tools.jackson.databind.JsonNode>();
+        rows.forEach(row -> { if (row.get("serverUrl").asText().equals(url)) matching.add(row); });
+        assertThat(matching).hasSize(1);
+        assertThat(matching.getFirst().get("latestStartup").get("id").asLong()).isEqualTo(latest.getId());
+        assertThat(response.getResponse().getContentAsString()).doesNotContain("old-test.example");
+    }
+
+    @Test
+    void preservesBasicChallengeWithoutTriggeringBrowserLoginPrompts() throws Exception {
+        mvc.perform(get("/api/telemetry/instances")).andExpect(status().isUnauthorized())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("WWW-Authenticate", "Basic realm=\"Artemis Telemetry\""));
+        mvc.perform(get("/api/telemetry/instances").header("X-Requested-With", "XMLHttpRequest")).andExpect(status().isUnauthorized())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().doesNotExist("WWW-Authenticate"));
+        mvc.perform(get("/api/telemetry/instances").with(httpBasic("test", "test"))).andExpect(status().isOk());
+    }
+
+    @Test
+    void dashboardDoesNotResurrectOptedOutContactDetails() throws Exception {
+        var old = (tools.jackson.databind.node.ObjectNode) mapper.valueToTree(report("https://privacy-dashboard.example", UUID.randomUUID().toString(), ZonedDateTime.now().minusHours(2)));
+        old.put("adminName", "Former Private Administrator");
+        old.put("contact", "former-private@example.org");
+        service.record(mapper.treeToValue(old, TelemetryDTO.class));
+        var latest = service.record(report("https://privacy-dashboard.example", UUID.randomUUID().toString(), ZonedDateTime.now().minusHours(1)));
+        var instance = service.getDashboard().stream().filter(i -> i.id().equals(latest.getInstanceId())).findFirst().orElseThrow();
+        assertThat(instance.latestStartup().adminName()).isNull();
+        assertThat(instance.latestStartup().contact()).isNull();
+    }
+
 }

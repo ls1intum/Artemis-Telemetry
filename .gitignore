@@ -36,3 +36,12 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/application-local.yml
+
+# Angular client
+client/node_modules/
+client/dist/
+client/.angular/
+client/coverage/
+client/test-results/
+config/*.env
+.angular/

@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: "${{ steps.output-tag.outputs.image_tag }}"
+      image_tag: "${{ steps.compute-tag.outputs.result }}"
 
     steps:
       - name: Compute Tag
