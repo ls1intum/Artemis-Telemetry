@@ -42,10 +42,9 @@ export class AppComponent implements OnInit {
     filtered = computed(() =>
         filterInstances(this.rows(), this.search(), this.environment(), this.days(), this.loadedAt()?.getTime() ?? Date.now()),
     );
+    // The API orders by lastSeen DESC, id DESC with full database timestamp precision.
     directory = computed(() =>
-        this.filtered()
-            .filter((row) => !this.hideUnidentified() || includeInDirectory(row))
-            .sort((a, b) => Date.parse(b.lastSeen) - Date.parse(a.lastSeen) || b.id - a.id),
+        this.filtered().filter((row) => !this.hideUnidentified() || includeInDirectory(row)),
     );
     pageCount = computed(() => Math.ceil(this.directory().length / this.pageSize));
     visibleRows = computed(() => this.directory().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));

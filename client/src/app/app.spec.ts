@@ -93,21 +93,21 @@ describe('dashboard', () => {
         expect(app.directory()).toHaveLength(6);
     });
 
-    it('sorts the directory by report instant descending, with stable ordering for ties', () => {
+    it('preserves the API newest-first order, including submillisecond report times', () => {
         app.rows.set([
-            { ...instance(1, { universityName: 'A' }), lastSeen: '2026-09-25T12:00:00Z' },
-            { ...instance(2, { universityName: 'Z' }), lastSeen: '2026-09-25T13:00:00Z' },
-            { ...instance(3, { universityName: 'B' }), lastSeen: '2026-09-25T14:30:00+02:00' },
             { ...instance(4, { universityName: 'Y' }), lastSeen: '2026-09-25T15:00:00+02:00' },
+            { ...instance(2, { universityName: 'Z' }), lastSeen: '2026-09-25T13:00:00Z' },
+            { ...instance(1, { universityName: 'A' }), lastSeen: '2026-09-25T12:00:00.000900Z' },
+            { ...instance(3, { universityName: 'B' }), lastSeen: '2026-09-25T14:00:00.000100+02:00' },
         ]);
-        expect(app.directory().map(row => row.id)).toEqual([4, 2, 3, 1]);
+        expect(app.directory().map(row => row.id)).toEqual([4, 2, 1, 3]);
     });
 
     it('shows 50 instances on the first page and the remainder on the next page', () => {
         app.rows.set(Array.from({ length: 51 }, (_, id) => ({
             ...instance(id, { universityName: 'Example University' }),
             lastSeen: new Date(Date.UTC(2026, 8, 25, 0, id)).toISOString(),
-        })));
+        })).reverse());
         expect(app.pageCount()).toBe(2);
         expect(app.visibleRows()).toHaveLength(50);
         expect(app.visibleRows()[0].id).toBe(50);
