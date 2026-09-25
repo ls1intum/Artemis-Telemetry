@@ -18,4 +18,5 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: gradle
+      - run: sh scripts/test-database-upgrade.sh
       - run: ./gradlew test bootJar

@@ -95,8 +95,11 @@ public class TelemetryService {
         if (dto.startupId() != null && !UUID.fromString(dto.startupId()).toString().equals(dto.startupId())) {
             throw new IllegalArgumentException("startupId must be a canonical UUID");
         }
-        if (dto.startedAt() != null && dto.startedAt().isAfter(java.time.ZonedDateTime.now().plusMinutes(5))) {
-            throw new IllegalArgumentException("startedAt must not be in the future");
+        if (dto.startedAt() != null) {
+            var instant = dto.startedAt().toInstant();
+            if (instant.isBefore(java.time.Instant.parse("1000-01-01T00:00:00Z")) || instant.isAfter(java.time.Instant.now().plusSeconds(300))) {
+                throw new IllegalArgumentException("startedAt must be within the database date range and not in the future");
+            }
         }
     }
 

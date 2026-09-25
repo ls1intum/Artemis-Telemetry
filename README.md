@@ -87,7 +87,11 @@ The runtime remains Java 25. Spring Boot's dependency set is used with current s
 HikariCP, Liquibase and MySQL Connector/J overrides. The database image advances from
 MySQL 9.6 to 26.7. Follow MySQL's supported upgrade path through the 9.7 LTS series:
 upgrade the existing data directory to `mysql:9.7.2` first, then to the configured
-`mysql:26.7.0`; keep a backup for rollback. See the
+`mysql:26.7.0`; keep a backup for rollback. The deployment workflow checks the running
+database before pulling or recreating any container and stops on an unsupported version
+or an existing data volume whose version cannot be verified. Only `9.7.2` and
+`26.7.0` are accepted for an existing database, preventing accidental downgrades too. Complete the 9.7 upgrade
+and rerun deployment. Fresh installations without a data volume can start directly. See the
 [MySQL upgrade paths](https://dev.mysql.com/doc/refman/26.7/en/upgrade-paths.html).
 
 ## Verification

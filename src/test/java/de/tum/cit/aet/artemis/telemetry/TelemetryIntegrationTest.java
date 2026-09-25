@@ -173,6 +173,15 @@ class TelemetryIntegrationTest {
     }
 
     @Test
+    void rejectsDatesOutsideDatabaseRange() throws Exception {
+        for (String startedAt : new String[] { "0999-12-31T23:59:59Z", "1000-01-01T00:00:00+01:00" }) {
+            mvc.perform(post("/api/telemetry").contentType(MediaType.APPLICATION_JSON).content("""
+                    {"version":"10","serverUrl":"https://date.example","operator":"U","profiles":["prod"],"startedAt":"%s"}
+                    """.formatted(startedAt))).andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
     void validatesPayloadAndDoesNotTrustClientIdentity() throws Exception {
         mvc.perform(post("/api/telemetry").contentType(MediaType.APPLICATION_JSON).content("""
                 {"id":1,"version":"10","serverUrl":"https://post.example","operator":"U","profiles":["prod"],"moduleFeatures":[]}
