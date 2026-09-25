@@ -10,6 +10,12 @@ Filters apply to the charts and directory together. “Last reported” is a sta
 not an uptime signal. The initial view includes all known non-test instances; use the environment selector
 to narrow the view to production.
 
+Artemis versions are ordered numerically from newest to oldest, with releases before
+their prereleases and unreported versions last. The directory additionally hides entries
+containing “test” (case-insensitive) in their URL, university, operator, name, or email,
+and entries missing all three of name, email, and university. This directory-only filter
+is enabled by default and can be switched off to show every matching entry.
+
 ### Single account
 
 The dashboard reuses the existing configured account. There is no registration, account

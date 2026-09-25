@@ -312,6 +312,26 @@ td {
 .directory-table {
     min-width: 1020px;
 }
+.directory-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+.directory-filter input {
+    width: 18px;
+    height: 18px;
+    min-height: 18px;
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: var(--blue);
+}
+.directory-filter-note {
+    font-size: 13px;
+    margin: 0 0 16px 28px;
+}
 .directory-table td:nth-child(1) {
     width: 24%;
     min-width: 210px;

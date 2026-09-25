@@ -22,6 +22,57 @@ function ranked(counts: Map<string, number>, total: number): Distribution[] {
         .map(([label, count]) => ({ label, count, percent: total ? (count * 100) / total : 0 }))
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
+
+/** Descending numeric versions, with releases before prereleases and unknown labels last. */
+export function compareVersions(a: string, b: string): number {
+    const pattern = /^v?(\d+(?:\.\d+)*)(?:-([\w.-]+))?(?:\+[\w.-]+)?$/i;
+    const left = pattern.exec(a);
+    const right = pattern.exec(b);
+    if (!left || !right) {
+        if (left) return -1;
+        if (right) return 1;
+        if (a === b) return 0;
+        if (a === 'Not reported') return 1;
+        if (b === 'Not reported') return -1;
+        return a.localeCompare(b);
+    }
+    const leftNumbers = left[1].split('.').map(BigInt);
+    const rightNumbers = right[1].split('.').map(BigInt);
+    for (let i = 0; i < Math.max(leftNumbers.length, rightNumbers.length); i++) {
+        const l = leftNumbers[i] ?? 0n;
+        const r = rightNumbers[i] ?? 0n;
+        if (l !== r) return l > r ? -1 : 1;
+    }
+    if (!left[2] || !right[2]) return left[2] ? 1 : right[2] ? -1 : 0;
+    const leftPre = left[2].split('.');
+    const rightPre = right[2].split('.');
+    for (let i = 0; i < Math.max(leftPre.length, rightPre.length); i++) {
+        const l = leftPre[i];
+        const r = rightPre[i];
+        if (l === r) continue;
+        if (l === undefined) return 1;
+        if (r === undefined) return -1;
+        const lNumeric = /^\d+$/.test(l);
+        const rNumeric = /^\d+$/.test(r);
+        if (lNumeric && rNumeric) {
+            if (BigInt(l) !== BigInt(r)) return BigInt(l) > BigInt(r) ? -1 : 1;
+        } else if (lNumeric !== rNumeric) {
+            return lNumeric ? 1 : -1;
+        } else {
+            return l > r ? -1 : 1;
+        }
+    }
+    return 0;
+}
+
+export function includeInDirectory(row: Instance): boolean {
+    const startup = row.latestStartup;
+    const identity = [startup.adminName, startup.contact, startup.universityName];
+    const hasIdentity = identity.some((value) => value?.trim());
+    const hasTest = [row.serverUrl, startup.operator, ...identity].some((value) => value?.toLowerCase().includes('test'));
+    return hasIdentity && !hasTest;
+}
+
 export function filterInstances(rows: Instance[], search: string, environment: string, days: number, now: number): Instance[] {
     const query = search.trim().toLocaleLowerCase();
     return rows.filter((row) => {
