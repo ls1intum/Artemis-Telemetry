@@ -1,4 +1,4 @@
-FROM node:24.21.0-alpine AS client
+FROM node:26.12.1-alpine AS client
 WORKDIR /client
 COPY client/package.json client/package-lock.json ./
 RUN npm ci --no-audit --no-fund
