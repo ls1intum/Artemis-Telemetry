@@ -11,6 +11,10 @@ export interface Startup {
     numberOfNodes?: number;
     buildAgentCount?: number;
     dataSource?: string;
+    ciSystem?: string;
+    versionControlSystem?: string;
+    distributedDataProvider?: string;
+    websocketBroker?: string;
     isProductionInstance?: boolean;
     isMultiNode?: boolean;
     startedAt?: string;

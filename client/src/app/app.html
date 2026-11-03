@@ -120,6 +120,9 @@
             [data]="modules()"
         />
         <app-chart title="Database engines" description="Database used by each instance." [data]="databases()" />
+        <app-chart title="CI systems" description="Build system of each instance. Instances on older Artemis versions do not report it." [data]="ciSystems()" />
+        <app-chart title="Distributed data" description="Provider that shares state between the nodes of each instance." [data]="distributedData()" />
+        <app-chart title="Websocket broker" description="Whether an instance relays websocket messages through an external broker." [data]="websocketBrokers()" />
         <app-chart
             title="Core-node distribution"
             description="Connected core nodes at report time. Missing counts stay unknown."

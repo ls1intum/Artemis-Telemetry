@@ -62,6 +62,9 @@ export class AppComponent implements OnInit {
     );
     modules = computed(() => moduleDistribution(this.filtered()));
     databases = computed(() => distribution(this.filtered(), (i) => i.latestStartup.dataSource));
+    ciSystems = computed(() => distribution(this.filtered(), (i) => i.latestStartup.ciSystem));
+    distributedData = computed(() => distribution(this.filtered(), (i) => i.latestStartup.distributedDataProvider));
+    websocketBrokers = computed(() => distribution(this.filtered(), (i) => i.latestStartup.websocketBroker));
     nodes = computed(() =>
         distribution(this.filtered(), (i) =>
             i.latestStartup.numberOfNodes == null

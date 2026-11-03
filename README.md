@@ -120,6 +120,15 @@ A report can additionally contain `universityName`, `moduleFeatures` (a JSON arr
 field remains the operator name. Missing, `null`, or empty `profiles` and `moduleFeatures`
 arrays are accepted and stored as SQL `NULL`; non-empty arrays retain their values.
 
+Newer Artemis versions also send the systems an installation runs: `ciSystem` (`localci`,
+`jenkins` or `none`), `versionControlSystem` (`localvc` or `none`), `distributedDataProvider`
+(`hazelcast`, `redis` or `local`) and `websocketBroker` (`external` for a STOMP relay to a broker
+such as ActiveMQ Artemis, `simple` for the in-memory broker). Older senders omit them and
+the columns stay `NULL`. A value must be a lowercase label of 1 to 32 letters, digits, hyphens or
+underscores, otherwise the report is rejected with 400. Unknown properties of a report are ignored,
+so a newer Artemis can add fields before the collector knows them. Deploy this collector before
+Artemis versions that send the new fields, so that none of them is dropped.
+
 The collector owns the receipt `timestamp` and database IDs. Repeated delivery of the
 same `startupId` for the same URL returns the existing report. Legacy reports without
 this ID append a new history entry each time. The newest `startedAt` determines the

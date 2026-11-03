@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import de.tum.cit.aet.artemis.telemetry.domain.Telemetry;
 import de.tum.cit.aet.artemis.telemetry.repository.TelemetryRepository;
@@ -22,6 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class TelemetryService {
+    /** Names of the CI system, version control system and middleware: short, lowercase, and free of anything that identifies a person. */
+    private static final Pattern LABEL = Pattern.compile("[a-z0-9_-]{1,32}");
+
     private final TelemetryRepository startups;
     private final TelemetryInstanceRepository instances;
     private final TelemetryIngestionRepository ingestion;
@@ -100,6 +104,11 @@ public class TelemetryService {
         }
         if (dto.moduleFeatures() != null && (dto.moduleFeatures().size() > 100 || dto.moduleFeatures().stream().anyMatch(f -> f == null || f.isBlank() || f.length() > 100))) {
             throw new IllegalArgumentException("Module features must contain at most 100 non-empty names of at most 100 characters");
+        }
+        for (String label : new String[] {dto.ciSystem(), dto.versionControlSystem(), dto.distributedDataProvider(), dto.websocketBroker()}) {
+            if (label != null && !LABEL.matcher(label).matches()) {
+                throw new IllegalArgumentException("System names must consist of 1 to 32 lowercase letters, digits, hyphens or underscores");
+            }
         }
         if (dto.startupId() != null && !UUID.fromString(dto.startupId()).toString().equals(dto.startupId())) {
             throw new IllegalArgumentException("startupId must be a canonical UUID");
