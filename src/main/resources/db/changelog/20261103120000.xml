@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+ <!-- Which CI system, version control system and middleware an installation runs. Older Artemis versions do not send them, so every column is nullable. -->
+ <changeSet id="20261103120000-1-ci-and-middleware" author="krusche">
+  <addColumn tableName="telemetry">
+   <column name="ci_system" type="varchar(32)"/>
+   <column name="version_control_system" type="varchar(32)"/>
+   <column name="distributed_data_provider" type="varchar(32)"/>
+   <column name="websocket_broker" type="varchar(32)"/>
+  </addColumn>
+ </changeSet>
+</databaseChangeLog>

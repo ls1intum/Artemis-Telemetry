@@ -11,4 +11,5 @@
     <include file="classpath:db/changelog/20241001210000.xml"/>
     <include file="classpath:db/changelog/20241010210000.xml"/>
     <include file="classpath:db/changelog/20260925160000.xml"/>
+    <include file="classpath:db/changelog/20261103120000.xml"/>
 </databaseChangeLog>

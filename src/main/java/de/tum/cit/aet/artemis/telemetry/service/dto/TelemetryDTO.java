@@ -9,13 +9,15 @@ import java.util.List;
 public record TelemetryDTO(Long id, String version, String serverUrl, String operator, String adminName, List<String> profiles, String contact,
         ZonedDateTime timestamp, Boolean isProductionInstance, Boolean isTestServer, Boolean isMultiNode, String dataSource,
         Integer numberOfNodes, Integer buildAgentCount, String universityName, List<String> moduleFeatures, String startupId,
-        ZonedDateTime startedAt, Boolean isLocalLLMDeploymentEnabled) {
+        ZonedDateTime startedAt, Boolean isLocalLLMDeploymentEnabled, String ciSystem, String versionControlSystem, String distributedDataProvider,
+        String websocketBroker) {
 
     public static TelemetryDTO from(Telemetry t) {
         return new TelemetryDTO(t.getId(), t.getVersion(), t.getServerUrl(), t.getOperatorName(), t.getAdminName(),
                 t.getProfiles() == null || t.getProfiles().isEmpty() ? List.of() : List.of(t.getProfiles().split(",")), t.getContact(), t.getTimestamp(),
                 t.isProductionInstance(), t.isTestServer(), t.isMultiNode(), t.getDataSource(), t.getNumberOfNodes(), t.getBuildAgentCount(),
-                t.getUniversityName(), t.getModuleFeatures(), t.getStartupId(), t.getStartedAt(), t.getLocalLLMDeploymentEnabled());
+                t.getUniversityName(), t.getModuleFeatures(), t.getStartupId(), t.getStartedAt(), t.getLocalLLMDeploymentEnabled(), t.getCiSystem(),
+                t.getVersionControlSystem(), t.getDistributedDataProvider(), t.getWebsocketBroker());
     }
 
     public static Telemetry to(TelemetryDTO dto) {
@@ -37,6 +39,10 @@ public record TelemetryDTO(Long id, String version, String serverUrl, String ope
         t.setStartupId(dto.startupId());
         t.setStartedAt(dto.startedAt());
         t.setLocalLLMDeploymentEnabled(dto.isLocalLLMDeploymentEnabled());
+        t.setCiSystem(dto.ciSystem());
+        t.setVersionControlSystem(dto.versionControlSystem());
+        t.setDistributedDataProvider(dto.distributedDataProvider());
+        t.setWebsocketBroker(dto.websocketBroker());
         return t;
     }
 }

@@ -197,5 +197,33 @@ public class Telemetry extends DomainObject {
 
     public List<String> getModuleFeatures() { return moduleFeatures; }
 
+    @Column(name = "ci_system")
+    private String ciSystem;
+
+    public String getCiSystem() { return ciSystem; }
+
+    public void setCiSystem(String ciSystem) { this.ciSystem = ciSystem; }
+
+    @Column(name = "version_control_system")
+    private String versionControlSystem;
+
+    public String getVersionControlSystem() { return versionControlSystem; }
+
+    public void setVersionControlSystem(String versionControlSystem) { this.versionControlSystem = versionControlSystem; }
+
+    @Column(name = "distributed_data_provider")
+    private String distributedDataProvider;
+
+    public String getDistributedDataProvider() { return distributedDataProvider; }
+
+    public void setDistributedDataProvider(String distributedDataProvider) { this.distributedDataProvider = distributedDataProvider; }
+
+    @Column(name = "websocket_broker")
+    private String websocketBroker;
+
+    public String getWebsocketBroker() { return websocketBroker; }
+
+    public void setWebsocketBroker(String websocketBroker) { this.websocketBroker = websocketBroker; }
+
     public void setModuleFeatures(List<String> moduleFeatures) { this.moduleFeatures = moduleFeatures; }
 }

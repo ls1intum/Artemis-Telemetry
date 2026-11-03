@@ -1,6 +1,7 @@
 package de.tum.cit.aet.artemis.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -123,6 +124,39 @@ class TelemetryIntegrationTest {
     }
 
     @Test
+    void storesCiSystemAndMiddleware() {
+        var dto = mapper.readValue("""
+                {"version":"10.7.0","serverUrl":"https://middleware.example","operator":"University","profiles":["prod","core","scheduling","localvc","localci"],
+                 "ciSystem":"localci","versionControlSystem":"localvc","distributedDataProvider":"redis","websocketBroker":"external"}
+                """, TelemetryDTO.class);
+        var saved = service.record(dto);
+        assertThat(saved.getCiSystem()).isEqualTo("localci");
+        assertThat(saved.getVersionControlSystem()).isEqualTo("localvc");
+        assertThat(saved.getDistributedDataProvider()).isEqualTo("redis");
+        assertThat(saved.getWebsocketBroker()).isEqualTo("external");
+        var latest = service.getDashboard().stream().filter(i -> i.serverUrl().equals("https://middleware.example")).findFirst().orElseThrow();
+        assertThat(latest.latestStartup().ciSystem()).isEqualTo("localci");
+        assertThat(latest.latestStartup().distributedDataProvider()).isEqualTo("redis");
+    }
+
+    @Test
+    void rejectsSystemNamesThatAreNotShortLowercaseLabels() {
+        for (String bad : new String[] {"Jenkins", "has space", "a,b", "x".repeat(33), ""}) {
+            var dto = mapper.readValue("""
+                    {"version":"10.7.0","serverUrl":"https://badlabel.example","operator":"University","ciSystem":"%s"}
+                    """.formatted(bad), TelemetryDTO.class);
+            assertThatThrownBy(() -> service.record(dto)).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Test
+    void acceptsFieldsAFutureArtemisVersionMightAdd() throws Exception {
+        mvc.perform(post("/api/telemetry").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"version\":\"99.0\",\"serverUrl\":\"https://future.example\",\"operator\":\"University\",\"ciSystem\":\"localci\",\"somethingNew\":\"x\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void legacySenderKeepsUnknownCountsAndFeatures() {
         var dto = mapper.readValue("""
                 {"version":"9.0","serverUrl":"https://unknown.example","operator":"University","profiles":["prod"]}
@@ -132,6 +166,8 @@ class TelemetryIntegrationTest {
         assertThat(saved.getBuildAgentCount()).isNull();
         assertThat(saved.isMultiNode()).isNull();
         assertThat(saved.getModuleFeatures()).isNull();
+        assertThat(saved.getCiSystem()).isNull();
+        assertThat(saved.getDistributedDataProvider()).isNull();
     }
 
     @Test
