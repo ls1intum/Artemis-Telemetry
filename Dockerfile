@@ -16,7 +16,8 @@ COPY --from=client /client/dist /home/gradle/src/client/dist
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar -PskipClient
 
-FROM eclipse-temurin:25.0.5_8-jre
+# Temurin has not published 25.0.5.1 images yet; SapMachine ships the same OpenJDK build (25.0.5.1+2).
+FROM sapmachine:25.0.5.1-jre-ubuntu-noble
 
 RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && mkdir /app
