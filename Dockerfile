@@ -1,11 +1,11 @@
-FROM node:24.22.2-alpine AS client
+FROM node:26.13.1-alpine AS client
 WORKDIR /client
 COPY client/package.json client/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY client/ ./
 RUN npm run build
 
-FROM gradle:9.8.2-jdk25 AS build
+FROM gradle:9.9.1-jdk25 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
@@ -16,7 +16,7 @@ COPY --from=client /client/dist /home/gradle/src/client/dist
 RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar -PskipClient
 
-FROM eclipse-temurin:25.0.4_7-jre
+FROM eclipse-temurin:25.0.5_8-jre
 
 RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && mkdir /app
