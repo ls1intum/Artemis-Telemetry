@@ -160,18 +160,19 @@ restore the pre-upgrade backup when rolling back the complete deployment.
 
 The runtime remains Java 25. Spring Boot's dependency set is used with current stable
 HikariCP, Liquibase and MySQL Connector/J overrides. The database image advances from
-MySQL 9.6 to 26.7. Follow MySQL's supported upgrade path through the 9.7 LTS series:
-upgrade the existing data directory to `mysql:9.7.2` first, then to the configured
-`mysql:26.7.0`; keep a backup for rollback. The deployment workflow checks the running
+MySQL 9.6 to 26.10. Follow MySQL's supported upgrade path through the 9.7 LTS series:
+upgrade the existing data directory to `mysql:9.7.2` first, then to `mysql:26.7.0`, and
+finally to the configured `mysql:26.10.0` (26.7 to 26.10 stays within one compatibility
+lineage and upgrades in place); keep a backup for rollback. The deployment workflow checks the running
 database before pulling or recreating any container and stops on an unsupported version
-or an existing data volume whose version cannot be verified. Only `9.7.2` and
-`26.7.0` are accepted for an existing database, preventing accidental downgrades too. Complete the 9.7 upgrade
+or an existing data volume whose version cannot be verified. Only `9.7.2`,
+`26.7.0` and `26.10.0` are accepted for an existing database, preventing accidental downgrades too. Complete the 9.7 upgrade
 and rerun deployment. Fresh installations without a data volume can start directly. See the
-[MySQL upgrade paths](https://dev.mysql.com/doc/refman/26.7/en/upgrade-paths.html).
+[MySQL upgrade paths](https://dev.mysql.com/doc/refman/26.10/en/upgrade-paths.html).
 
 ## Verification
 
 Run `./gradlew test bootJar` with Java 25 and Docker available. Tests use a disposable
-MySQL 26.7 container, apply the original schema with populated legacy data, then run
+MySQL 26.10 container, apply the original schema with populated legacy data, then run
 the migration and exercise ingestion, concurrency, authentication and pagination.
 Run `docker build -t artemis-telemetry:local .` to verify the production image.
