@@ -37,7 +37,7 @@ import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
 @SpringBootTest(properties = {"telemetry.user=test", "telemetry.password=test", "spring.jpa.hibernate.ddl-auto=validate"})
 @AutoConfigureMockMvc
 class TelemetryIntegrationTest {
-    static final MySQLContainer MYSQL = new MySQLContainer("mysql:26.7.0");
+    static final MySQLContainer MYSQL = new MySQLContainer("mysql:26.10.0");
     static {
         MYSQL.start();
         try (var connection = DriverManager.getConnection(MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword())) {

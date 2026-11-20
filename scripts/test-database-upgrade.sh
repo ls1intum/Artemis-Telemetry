@@ -16,8 +16,8 @@ case "$1 $2" in
 esac
 MOCK
 chmod +x "$test_dir/docker"
-for scenario in 9.6.0 8.4.11 9.7.2 26.7.0 26.7.1 fresh orphan unavailable; do
-    case "$scenario" in 9.7.2|26.7.0|fresh) expected=0 ;; *) expected=1 ;; esac
+for scenario in 9.6.0 8.4.11 9.7.2 26.7.0 26.7.1 26.10.0 26.10.1 26.1.0 fresh orphan unavailable; do
+    case "$scenario" in 9.7.2|26.7.0|26.10.0|fresh) expected=0 ;; *) expected=1 ;; esac
     actual=0
     SCENARIO="$scenario" PATH="$test_dir:$PATH" sh "$script_dir/check-database-upgrade.sh" > "$test_dir/output" 2>&1 || actual=$?
     if test "$actual" != "$expected"; then
@@ -26,4 +26,4 @@ for scenario in 9.6.0 8.4.11 9.7.2 26.7.0 26.7.1 fresh orphan unavailable; do
         exit 1
     fi
 done
-echo 'Passed all 8 database upgrade preflight scenarios.'
+echo 'Passed all 11 database upgrade preflight scenarios.'
