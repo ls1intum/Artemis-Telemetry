@@ -3,20 +3,15 @@ spring:
     name: Artemis-Telemetry
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/artemis-telemetry?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
-    username: root
-    #        password: 12345678
+    url: jdbc:postgresql://localhost:5432/artemis-telemetry
+    username: telemetry
+    password: telemetry
     hikari:
       pool-name: telemetry
       auto-commit: false
       minimum-idle: 8
       maximum-pool-size: 24
       transaction-isolation: TRANSACTION_READ_COMMITTED
-      data-source-properties:
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml

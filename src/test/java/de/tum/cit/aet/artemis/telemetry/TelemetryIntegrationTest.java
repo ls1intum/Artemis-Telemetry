@@ -29,7 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.mysql.MySQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import tools.jackson.databind.json.JsonMapper;
 import de.tum.cit.aet.artemis.telemetry.service.TelemetryService;
 import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
@@ -37,10 +37,10 @@ import de.tum.cit.aet.artemis.telemetry.service.dto.TelemetryDTO;
 @SpringBootTest(properties = {"telemetry.user=test", "telemetry.password=test", "spring.jpa.hibernate.ddl-auto=validate"})
 @AutoConfigureMockMvc
 class TelemetryIntegrationTest {
-    static final MySQLContainer MYSQL = new MySQLContainer("mysql:26.10.0");
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:19");
     static {
-        MYSQL.start();
-        try (var connection = DriverManager.getConnection(MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword())) {
+        POSTGRES.start();
+        try (var connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())) {
             var database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             try (var liquibase = new Liquibase("legacy-changelog.xml", new SpringResourceAccessor(new DefaultResourceLoader()), database)) {
                 liquibase.update(new liquibase.Contexts());
@@ -62,9 +62,9 @@ class TelemetryIntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry properties) {
-        properties.add("spring.datasource.url", MYSQL::getJdbcUrl);
-        properties.add("spring.datasource.username", MYSQL::getUsername);
-        properties.add("spring.datasource.password", MYSQL::getPassword);
+        properties.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        properties.add("spring.datasource.username", POSTGRES::getUsername);
+        properties.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
     @Autowired TelemetryService service;

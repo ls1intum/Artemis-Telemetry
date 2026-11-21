@@ -45,3 +45,6 @@ client/coverage/
 client/test-results/
 config/*.env
 .angular/
+
+### Secrets ###
+.env

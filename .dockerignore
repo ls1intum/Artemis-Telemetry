@@ -12,3 +12,4 @@ client/.angular
 client/coverage
 client/test-results
 .angular
+.env

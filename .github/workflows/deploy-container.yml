@@ -25,7 +25,7 @@ jobs:
           proxy_username: ${{ vars.DEPLOYMENT_GATEWAY_USER }}
           proxy_key: ${{ secrets.DEPLOYMENT_GATEWAY_SSH_KEY }}
           proxy_port: ${{ vars.DEPLOYMENT_GATEWAY_PORT }}
-          source: 'docker-compose.yml,scripts/check-database-upgrade.sh,scripts/backup-database.sh'
+          source: 'docker-compose.yml,scripts/check-database-upgrade.sh,scripts/backup-database.sh,scripts/migrate-mysql-to-postgres.sh'
           target: '/opt/artemis-telemetry'
 
       - name: Copy docker-compose to server

@@ -69,17 +69,17 @@ Use `docker compose up` for quick start.
 ## Development
 
 ### Running [Artemis](https://github.com/ls1intum/Artemis) in parallel (locally)
-Adjust the port on which the telemetry service and its database are running (with the default configuration Artemis will be running on port `8080` and a mysql database on port `3306`).
+Adjust the port on which the telemetry service and its database are running (with the default configuration Artemis will be running on port `8080` and a PostgreSQL database on port `5432`).
 
-Adjust the `docker-compose.yml` accordingly, e.g. the following adjustments will be needed to run the telemetry service on port `8081` and its database on port `3307`:  
+Adjust the `docker-compose.yml` accordingly, e.g. the following adjustments will be needed to run the telemetry service on port `8081` and its database on port `5433`:  
 ```
 services:
 telemetry:
   ports:
     - '127.0.0.1:8081:8080'
-mysql:
+postgres:
   ports:
-    - "3307:3306"
+    - "127.0.0.1:5433:5432"
 ```
 
 For using the local telemetry service in a development setup you will need to adjust the `application-dev.yml` (within Artemis, not within the telemetry service) accordingly:
@@ -158,21 +158,60 @@ No existing changeset is rewritten. Back up the database before upgrading. The s
 is additive, but an old collector does not maintain the new overview after rollback;
 restore the pre-upgrade backup when rolling back the complete deployment.
 
-The runtime remains Java 25. Spring Boot's dependency set is used with current stable
-HikariCP, Liquibase and MySQL Connector/J overrides. The database image advances from
-MySQL 9.6 to 26.10. Follow MySQL's supported upgrade path through the 9.7 LTS series:
-upgrade the existing data directory to `mysql:9.7.2` first, then to `mysql:26.7.0`, and
-finally to the configured `mysql:26.10.0` (26.7 to 26.10 stays within one compatibility
-lineage and upgrades in place); keep a backup for rollback. The deployment workflow checks the running
-database before pulling or recreating any container and stops on an unsupported version
-or an existing data volume whose version cannot be verified. Only `9.7.2`,
-`26.7.0` and `26.10.0` are accepted for an existing database, preventing accidental downgrades too. Complete the 9.7 upgrade
-and rerun deployment. Fresh installations without a data volume can start directly. See the
-[MySQL upgrade paths](https://dev.mysql.com/doc/refman/26.10/en/upgrade-paths.html).
+The runtime remains Java 25. The database is PostgreSQL 19 (`postgres:19`, data in the
+`artemis-telemetry-postgres-data` volume). Minor releases are picked up on every deployment; a
+data directory cannot be opened by another major version, so the deployment workflow checks the
+running database before pulling or recreating any container and stops unless it is PostgreSQL 19,
+or the volume exists without a running database. To change the major version later, dump the data
+and restore it into a new volume. Fresh installations without a data volume start directly.
+The database connection is configured in `docker-compose.yml` (not in `config/telemetry.env`).
+The database password has no default: Compose refuses to start without `POSTGRES_PASSWORD`, which it
+reads from an `.env` file next to the compose file (not in Git). Locally, `cp .env.example .env`;
+on the server, `/opt/artemis-telemetry/.env` (mode 600) holds a generated value, for example from
+`openssl rand -hex 24`. PostgreSQL only applies the password when it creates the volume, so changing it
+later also needs `ALTER USER telemetry PASSWORD '...'`. PostgreSQL listens on `127.0.0.1:5432` of the host only.
+For running the application outside Docker (`./gradlew bootRun`), `application.yml` expects the
+database from `docker compose up postgres` with the user `telemetry` and the password `telemetry`
+(use `POSTGRES_PASSWORD=telemetry` locally, or override `SPRING_DATASOURCE_PASSWORD`).
+
+### Migrating a MySQL installation to PostgreSQL
+
+Production ran on MySQL until the move to PostgreSQL. The deployment of that release is
+deliberately stopped by `scripts/check-database-upgrade.sh` while a `mysql` container exists, so
+merging it can never start the application on an empty database. Migrate once, on the server:
+
+1. Merge to `main`. The workflow builds and pushes the image, copies the new compose file and the
+   scripts to `/opt/artemis-telemetry`, and then fails at the preflight check. The old application
+   keeps running on MySQL.
+2. Create `/opt/artemis-telemetry/.env` (mode 600, owned by the deploy user) containing
+   `POSTGRES_PASSWORD=<openssl rand -hex 24>`; the deployment workflow never touches it.
+   Then run `sh /opt/artemis-telemetry/scripts/migrate-mysql-to-postgres.sh` on the server. It
+   - pulls the images, starts PostgreSQL and lets the new application create the schema (no downtime);
+   - stops the application, writes a full MySQL dump to `/opt/artemis-telemetry/backups/mysql-before-postgres-*.sql.gz`,
+     copies both tables, and compares row counts and a checksum of every column between MySQL and
+     PostgreSQL. Text is transferred hex-encoded, so quotes, tabs, line breaks and emoji survive unchanged;
+   - resets the id counters, removes the `mysql` container, starts the application on PostgreSQL and
+     reloads nginx so that it finds the new container.
+
+   Any failure before the last step removes the half-built PostgreSQL volume and restarts the old
+   application on MySQL; fix the cause and run the script again. Expect a few minutes of downtime
+   (stop, dump, copy, verify, start).
+3. Re-run the failed deployment workflow. The preflight now passes and the normal deployment follows.
+
+Rollback after a successful migration: the `artemis-telemetry-mysql-data` volume and the dump are
+untouched. Redeploy the previous commit with its compose file; it starts `mysql:26.10.0` on that volume.
+Reports received after the cutover exist only in PostgreSQL. Delete the volume and the dump once
+PostgreSQL has proven itself. Anything that connected to MySQL port 3306 directly (the old compose
+file published it on all interfaces) has to be pointed at PostgreSQL.
+
+The copy assumes the `datetime` columns hold UTC, which the application guaranteed through
+`hibernate.jdbc.time_zone: UTC`. To confirm on the server beforehand, run
+`docker exec mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot "$MYSQL_DATABASE" -e "SELECT MAX(timestamp), UTC_TIMESTAMP() FROM telemetry"'`:
+the two values should be close together. Delete `scripts/migrate-mysql-to-postgres.sh` after the migration.
 
 ## Verification
 
 Run `./gradlew test bootJar` with Java 25 and Docker available. Tests use a disposable
-MySQL 26.10 container, apply the original schema with populated legacy data, then run
+PostgreSQL 19 container, apply the original schema with populated legacy data, then run
 the migration and exercise ingestion, concurrency, authentication and pagination.
 Run `docker build -t artemis-telemetry:local .` to verify the production image.

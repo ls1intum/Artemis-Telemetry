@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+ <!--
+   The earlier changesets were written for MySQL, where datetime(6) holds UTC wall-clock time and json is a native type.
+   On PostgreSQL they would produce "timestamp without time zone" and "json". Hibernate reads and writes ZonedDateTime as
+   "timestamp with time zone" and JSON attributes as jsonb, so convert once, after the shared schema has been created.
+   MySQL installations skip this changeset (dbms), which also keeps the checksums of the applied changesets unchanged.
+ -->
+ <changeSet id="20261121100000-1-postgres-types" author="krusche" dbms="postgresql">
+  <sql>
+   ALTER TABLE telemetry
+    ALTER COLUMN "timestamp" TYPE timestamptz USING "timestamp" AT TIME ZONE 'UTC',
+    ALTER COLUMN started_at TYPE timestamptz USING started_at AT TIME ZONE 'UTC',
+    ALTER COLUMN module_features TYPE jsonb USING module_features::jsonb
+  </sql>
+  <sql>
+   ALTER TABLE telemetry_instance
+    ALTER COLUMN first_seen TYPE timestamptz USING first_seen AT TIME ZONE 'UTC',
+    ALTER COLUMN last_seen TYPE timestamptz USING last_seen AT TIME ZONE 'UTC'
+  </sql>
+ </changeSet>
+</databaseChangeLog>
