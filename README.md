@@ -174,40 +174,21 @@ For running the application outside Docker (`./gradlew bootRun`), `application.y
 database from `docker compose up postgres` with the user `telemetry` and the password `telemetry`
 (use `POSTGRES_PASSWORD=telemetry` locally, or override `SPRING_DATASOURCE_PASSWORD`).
 
-### Migrating a MySQL installation to PostgreSQL
+### Migration from MySQL
 
-Production ran on MySQL until the move to PostgreSQL. The deployment of that release is
-deliberately stopped by `scripts/check-database-upgrade.sh` while a `mysql` container exists, so
-merging it can never start the application on an empty database. Migrate once, on the server:
+Production moved from MySQL to PostgreSQL on 2026-11-21 (28339 reports, 72 installations, every column
+verified identical). The one-time script is `scripts/migrate-mysql-to-postgres.sh` in commit `15bd633`,
+removed afterwards; its README section described the steps. `scripts/check-database-upgrade.sh` still
+refuses to deploy while a `mysql` container exists or a MySQL data volume has no PostgreSQL counterpart,
+so a deployment can never start the application on an empty database.
 
-1. Merge to `main`. The workflow builds and pushes the image, copies the new compose file and the
-   scripts to `/opt/artemis-telemetry`, and then fails at the preflight check. The old application
-   keeps running on MySQL.
-2. Create `/opt/artemis-telemetry/.env` (mode 600, owned by the deploy user) containing
-   `POSTGRES_PASSWORD=<openssl rand -hex 24>`; the deployment workflow never touches it.
-   Then run `sh /opt/artemis-telemetry/scripts/migrate-mysql-to-postgres.sh` on the server. It
-   - pulls the images, starts PostgreSQL and lets the new application create the schema (no downtime);
-   - stops the application, writes a full MySQL dump to `/opt/artemis-telemetry/backups/mysql-before-postgres-*.sql.gz`,
-     copies both tables, and compares row counts and a checksum of every column between MySQL and
-     PostgreSQL. Text is transferred hex-encoded, so quotes, tabs, line breaks and emoji survive unchanged;
-   - resets the id counters, removes the `mysql` container, starts the application on PostgreSQL and
-     reloads nginx so that it finds the new container.
+Rollback copies left on the server until PostgreSQL has proven itself: the `artemis-telemetry-mysql-data`
+volume, `backups/mysql-before-postgres-*.sql.gz` and the image tag `ls1tum/artemis-telemetry:pre-postgres`.
+To roll back, deploy the previous commit; its compose file starts `mysql:26.10.0` on that volume. Reports
+received after the cutover exist only in PostgreSQL.
 
-   Any failure before the last step removes the half-built PostgreSQL volume and restarts the old
-   application on MySQL; fix the cause and run the script again. Expect a few minutes of downtime
-   (stop, dump, copy, verify, start).
-3. Re-run the failed deployment workflow. The preflight now passes and the normal deployment follows.
-
-Rollback after a successful migration: the `artemis-telemetry-mysql-data` volume and the dump are
-untouched. Redeploy the previous commit with its compose file; it starts `mysql:26.10.0` on that volume.
-Reports received after the cutover exist only in PostgreSQL. Delete the volume and the dump once
-PostgreSQL has proven itself. Anything that connected to MySQL port 3306 directly (the old compose
-file published it on all interfaces) has to be pointed at PostgreSQL.
-
-The copy assumes the `datetime` columns hold UTC, which the application guaranteed through
-`hibernate.jdbc.time_zone: UTC`. To confirm on the server beforehand, run
-`docker exec mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot "$MYSQL_DATABASE" -e "SELECT MAX(timestamp), UTC_TIMESTAMP() FROM telemetry"'`:
-the two values should be close together. Delete `scripts/migrate-mysql-to-postgres.sh` after the migration.
+The copy relied on the `datetime` columns holding UTC, which the application guaranteed through
+`hibernate.jdbc.time_zone: UTC`.
 
 ## Verification
 

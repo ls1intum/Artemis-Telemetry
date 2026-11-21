@@ -3,10 +3,10 @@
 # start the application on an empty or unsupported database.
 set -eu
 
-# The MySQL container is removed by scripts/migrate-mysql-to-postgres.sh as its very last step, so a MySQL
-# container that still exists means the production data has not (completely) been moved to PostgreSQL.
+# The one-time migration (scripts/migrate-mysql-to-postgres.sh in commit 15bd633) removed the MySQL container as its
+# very last step, so a MySQL container that still exists means the data has not (completely) been moved to PostgreSQL.
 if docker container inspect mysql >/dev/null 2>&1; then
-    echo 'A MySQL container still exists: the data has not been migrated to PostgreSQL. Run scripts/migrate-mysql-to-postgres.sh first; deployment stopped.' >&2
+    echo 'A MySQL container still exists: the data has not been migrated to PostgreSQL. Run the migration script from commit 15bd633 first; deployment stopped.' >&2
     exit 1
 fi
 
@@ -27,7 +27,7 @@ elif docker volume inspect artemis-telemetry-postgres-data >/dev/null 2>&1; then
     echo 'Existing PostgreSQL data volume has no running database to verify; deployment stopped. Start its compatible PostgreSQL version first.' >&2
     exit 1
 elif docker volume inspect artemis-telemetry-mysql-data >/dev/null 2>&1; then
-    echo 'A MySQL data volume exists but there is no PostgreSQL database: the data has not been migrated. Run scripts/migrate-mysql-to-postgres.sh first; deployment stopped.' >&2
+    echo 'A MySQL data volume exists but there is no PostgreSQL database: the data has not been migrated. Run the migration script from commit 15bd633 first; deployment stopped.' >&2
     exit 1
 else
     echo 'No existing database volume; a fresh installation can use PostgreSQL 19.'
