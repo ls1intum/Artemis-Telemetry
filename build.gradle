@@ -24,10 +24,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'org.postgresql:postgresql'
     testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
     testImplementation "org.springframework.boot:spring-boot-starter-security-test"
-    testImplementation "org.testcontainers:testcontainers-mysql"
+    testImplementation "org.testcontainers:testcontainers-postgresql"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }

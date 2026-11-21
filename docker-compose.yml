@@ -7,6 +7,11 @@ services:
       dockerfile: Dockerfile
     env_file:
       - config/telemetry.env
+    environment:
+      # Set here, not in config/telemetry.env, so a server whose env file still names MySQL needs no manual edit.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/artemis-telemetry
+      SPRING_DATASOURCE_USERNAME: telemetry
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the .env file next to docker-compose.yml (see .env.example)}
     ports:
       - '127.0.0.1:8080:8080'
     expose:
@@ -16,28 +21,31 @@ services:
       start_period: 600s
       interval: 1s
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     restart: always
 
-  mysql:
-    container_name: mysql
-    image: mysql:26.10.0
+  postgres:
+    container_name: postgres
+    image: postgres:19
     volumes:
-      - artemis-telemetry-mysql-data:/var/lib/mysql
-    env_file:
-      - config/mysql.env
+      # PostgreSQL 18+ images keep their data in a major-version subdirectory below this mount.
+      - artemis-telemetry-postgres-data:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: telemetry
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the .env file next to docker-compose.yml (see .env.example)}
+      POSTGRES_DB: artemis-telemetry
     ports:
-      - "3306:3306"
-    command: mysqld --lower_case_table_names=1 --tls-version='' --character_set_server=utf8mb4  --collation-server=utf8mb4_unicode_ci --explicit_defaults_for_timestamp
+      - "127.0.0.1:5432:5432"
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u root --silent
+      # Use TCP: during first start the entrypoint runs a temporary server that only listens on the socket.
+      test: pg_isready -h 127.0.0.1 -U telemetry -d artemis-telemetry
       interval: 5s
       timeout: 3s
       retries: 30
-      start_period: 300s
+      start_period: 60s
     restart: always
 
 volumes:
-  artemis-telemetry-mysql-data:
-    name: artemis-telemetry-mysql-data
+  artemis-telemetry-postgres-data:
+    name: artemis-telemetry-postgres-data
