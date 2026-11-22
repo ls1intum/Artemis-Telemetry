@@ -17,7 +17,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon clean bootJar -PskipClient
 
 # Temurin has not published 25.0.5.1 images yet; SapMachine ships the same OpenJDK build (25.0.5.1+2).
-FROM sapmachine:25.0.5.1-jre-ubuntu-noble
+FROM sapmachine:27.0.1.0.3-jre-ubuntu-noble
 
 RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && mkdir /app
